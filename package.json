@@ -1,12 +1,26 @@
 {
   "name": "nehaber-mobile",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "expo-router/entry",
   "dependencies": {
+    "@gorhom/bottom-sheet": "^5.2.14",
+    "@shopify/flash-list": "^2.0.2",
+    "@tanstack/react-query": "^5.101.0",
+    "axios": "^1.17.0",
     "expo": "~56.0.8",
+    "expo-constants": "~56.0.16",
+    "expo-image": "~56.0.9",
+    "expo-linking": "~56.0.13",
+    "expo-router": "~56.2.8",
+    "expo-secure-store": "^56.0.4",
     "expo-status-bar": "~56.0.4",
+    "moti": "^0.30.0",
     "react": "19.2.3",
-    "react-native": "0.85.3"
+    "react-native": "0.85.3",
+    "react-native-gesture-handler": "~2.31.1",
+    "react-native-reanimated": "^4.3.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "4.25.2"
   },
   "scripts": {
     "start": "expo start",

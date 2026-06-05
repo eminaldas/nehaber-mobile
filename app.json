@@ -1,24 +1,24 @@
 {
   "expo": {
-    "name": "nehaber-mobile",
-    "slug": "nehaber-mobile",
+    "name": "NeHaber",
+    "slug": "nehaber",
+    "scheme": "nehaber",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "dev.nehaber.app"
     },
     "android": {
+      "package": "dev.nehaber.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#1a9e4f"
       }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     }
   }
 }
