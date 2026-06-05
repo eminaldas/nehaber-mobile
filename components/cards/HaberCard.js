@@ -1,11 +1,8 @@
 import { Image } from 'expo-image';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getRiskColor, palette, radius, spacing, typography } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 function RiskBar({ score }) {
   const color = getRiskColor(score ?? 0);
@@ -19,18 +16,12 @@ function RiskBar({ score }) {
 
 export default function HaberCard({ item, onPress }) {
   const { colors } = useTheme();
-  const scale = useSharedValue(1);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
 
   return (
-    <AnimatedPressable
-      style={[styles.card, { backgroundColor: colors.bg.surface, borderColor: colors.border }, animStyle]}
-      onPressIn={() => { scale.value = withSpring(0.97); }}
-      onPressOut={() => { scale.value = withSpring(1); }}
+    <TouchableOpacity
+      style={[styles.card, { backgroundColor: colors.bg.surface, borderColor: colors.border }]}
       onPress={onPress}
+      activeOpacity={0.85}
     >
       {item.image_url ? (
         <Image
@@ -70,22 +61,22 @@ export default function HaberCard({ item, onPress }) {
           </View>
         )}
       </View>
-    </AnimatedPressable>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card:            { borderRadius: radius.lg, borderWidth: 1, marginHorizontal: spacing.md, marginBottom: spacing.md, overflow: 'hidden' },
   image:           { width: '100%', height: 180 },
-  imagePlaceholder:{ width:'100%', height:180, alignItems:'center', justifyContent:'center' },
+  imagePlaceholder:{ width: '100%', height: 180, alignItems: 'center', justifyContent: 'center' },
   body:            { padding: spacing.md },
-  meta:            { flexDirection:'row', justifyContent:'space-between', marginBottom: spacing.xs },
-  source:          { fontSize: typography.xs, fontWeight:'600', flex:1 },
+  meta:            { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs },
+  source:          { fontSize: typography.xs, fontWeight: '600', flex: 1 },
   time:            { fontSize: typography.xs },
-  title:           { fontSize: typography.md, fontWeight:'600', lineHeight: 22, marginBottom: spacing.sm },
-  riskRow:         { flexDirection:'row', alignItems:'center', gap: spacing.xs },
+  title:           { fontSize: typography.md, fontWeight: '600', lineHeight: 22, marginBottom: spacing.sm },
+  riskRow:         { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   riskLabel:       { fontSize: typography.xs, width: 28 },
-  riskTrack:       { flex:1, height:4, backgroundColor:'#e5e7eb', borderRadius: radius.full, overflow:'hidden' },
-  riskFill:        { height:'100%', borderRadius: radius.full },
-  riskPct:         { fontSize: typography.xs, width: 30, textAlign:'right', fontWeight:'600' },
+  riskTrack:       { flex: 1, height: 4, backgroundColor: '#e5e7eb', borderRadius: radius.full, overflow: 'hidden' },
+  riskFill:        { height: '100%', borderRadius: radius.full },
+  riskPct:         { fontSize: typography.xs, width: 30, textAlign: 'right', fontWeight: '600' },
 });
