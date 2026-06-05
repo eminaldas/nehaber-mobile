@@ -1,7 +1,6 @@
-import { FlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ShimmerCard from '../../../components/ui/ShimmerCard';
 import { palette, radius, spacing, typography } from '../../../constants/theme';
@@ -63,13 +62,12 @@ export default function ForumScreen() {
       <View style={[styles.header, { backgroundColor: colors.bg.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.headerTitle, { color: colors.text.primary }]}>Forum</Text>
       </View>
-      <FlashList
+      <FlatList
         data={items}
         keyExtractor={item => String(item.id)}
         renderItem={({ item }) => (
           <ForumCard item={item} onPress={() => router.push(`/(tabs)/forum/${item.id}`)} />
         )}
-        estimatedItemSize={120}
         onEndReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}
         onEndReachedThreshold={0.5}
         onRefresh={refetch}

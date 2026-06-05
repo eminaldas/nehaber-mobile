@@ -1,7 +1,6 @@
-import { FlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import HaberCard from '../../../components/cards/HaberCard';
 import ShimmerCard from '../../../components/ui/ShimmerCard';
 import { palette, radius, spacing, typography } from '../../../constants/theme';
@@ -61,7 +60,7 @@ export default function HaberlerScreen() {
 
       <FilterChips selected={category} onSelect={setCategory} />
 
-      <FlashList
+      <FlatList
         data={items}
         keyExtractor={item => String(item.id)}
         renderItem={({ item }) => (
@@ -70,7 +69,6 @@ export default function HaberlerScreen() {
             onPress={() => router.push(`/(tabs)/haberler/${item.id}`)}
           />
         )}
-        estimatedItemSize={280}
         onEndReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}
         onEndReachedThreshold={0.5}
         onRefresh={refetch}
