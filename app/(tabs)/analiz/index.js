@@ -31,7 +31,9 @@ export default function AnalizScreen() {
       { type: mode, payload },
       {
         onSuccess: (data) => {
-          router.push(`/(tabs)/analiz/${data.task_id}`);
+          if (data.task_id) {
+            router.push(`/(tabs)/analiz/${data.task_id}`);
+          }
         },
       },
     );
