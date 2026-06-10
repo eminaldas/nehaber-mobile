@@ -45,3 +45,5 @@ yarn-error.*
 # Claude / scratch
 .claude/
 navbar-mockup.html
+CLAUDE.md
+AGENTS.md
