@@ -1,60 +1,62 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { palette, typography } from '../../constants/theme';
-import { useTheme } from '../../hooks/useTheme';
+import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import GlassTabBarBackground from '../../components/navigation/GlassTabBarBackground';
+import { palette } from '../../constants/theme';
 
-function TabIcon({ focused, label, emoji }) {
-  const { colors } = useTheme();
+const ICONS = {
+  haberler: { on: 'newspaper',           off: 'newspaper-outline' },
+  analiz:   { on: 'search',              off: 'search-outline' },
+  forum:    { on: 'chatbubble-ellipses', off: 'chatbubble-ellipses-outline' },
+  profil:   { on: 'person',              off: 'person-outline' },
+};
+
+function TabIcon({ focused, name }) {
+  const cfg = ICONS[name];
   return (
     <View style={styles.iconWrap}>
-      <Text style={{ fontSize: 20 }}>{emoji}</Text>
-      <Text style={[
-        styles.label,
-        { color: focused ? palette.brand.primary : colors.text.muted },
-      ]}>
-        {label}
-      </Text>
+      <Ionicons
+        name={focused ? cfg.on : cfg.off}
+        size={22}
+        color={focused ? palette.brand.bright : '#eef3f7'}
+      />
     </View>
   );
 }
 
 export default function TabsLayout() {
-  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: colors.bg.surface,
-          borderTopColor:  colors.border,
-          height: 60,
-          paddingBottom: 6,
-        },
         tabBarShowLabel: false,
+        tabBarBackground: () => <GlassTabBarBackground />,
+        tabBarStyle: {
+          position: 'absolute',
+          left: 0, right: 0, bottom: 0,
+          borderTopWidth: 0,
+          elevation: 0,
+          backgroundColor: 'transparent',
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom,
+          paddingTop: 6,
+        },
       }}
     >
-      <Tabs.Screen
-        name="haberler"
-        options={{ tabBarIcon: (p) => <TabIcon {...p} label="Haberler" emoji="📰" /> }}
-      />
-      <Tabs.Screen
-        name="analiz"
-        options={{ tabBarIcon: (p) => <TabIcon {...p} label="Analiz" emoji="🔍" /> }}
-      />
-      <Tabs.Screen
-        name="forum"
-        options={{ tabBarIcon: (p) => <TabIcon {...p} label="Forum" emoji="💬" /> }}
-      />
-      <Tabs.Screen
-        name="profil"
-        options={{ tabBarIcon: (p) => <TabIcon {...p} label="Profil" emoji="👤" /> }}
-      />
+      {Object.keys(ICONS).map((name) => (
+        <Tabs.Screen
+          key={name}
+          name={name}
+          options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name={name} /> }}
+        />
+      ))}
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
-  iconWrap: { alignItems: 'center', justifyContent: 'center' },
-  label:    { fontSize: typography.xs, marginTop: 2 },
+  iconWrap: { alignItems: 'center', justifyContent: 'center', height: 40, width: 60 },
 });
