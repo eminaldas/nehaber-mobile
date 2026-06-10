@@ -1,9 +1,10 @@
 export const palette = {
   brand: {
-    primary:   '#1a9e4f',
-    secondary: '#157a3c',
-    accent:    '#e8f5ee',
-    light:     '#d1edd9',
+    primary:   '#10b981',   // emerald — yalnızca aksan (aktif sekme, badge, köşe HUD)
+    secondary: '#0e9f6e',
+    bright:    '#3fff8b',   // parlak yeşil — aktif ikon/çizgi (koyu zeminde pop)
+    accent:    '#0c1b16',   // koyu emerald-siyah dolgu (placeholder vb.)
+    light:     '#1a2e26',
   },
   authentic: {
     bg:     '#dcfce7',
@@ -42,11 +43,12 @@ export const light = {
     base:    '#f2f7f4',
     surface: '#f8fffe',
     solid:   '#eaeef2',
+    deepest: '#ffffff',   // top bar / nav bar
   },
   text: {
     primary:   '#0d2b1a',
     secondary: '#1a4028',
-    muted:     '#2e5c3a',
+    muted:     '#5a6b62',
   },
   border:  '#d0d7de',
   skeleton: {
@@ -55,21 +57,23 @@ export const light = {
   },
 };
 
+// Siyaha yakın — neredeyse saf siyah arka plan, nötr gri metin, yeşil yalnızca aksan
 export const dark = {
   bg: {
-    base:    '#0d1f12',
-    surface: '#1a2e1f',
-    solid:   '#152619',
+    base:    '#06080b',
+    surface: '#0d1116',
+    solid:   '#161b21',
+    deepest: '#070a0d',   // top bar / nav bar
   },
   text: {
-    primary:   '#e8f5ee',
-    secondary: '#b8d9c4',
-    muted:     '#7aad8a',
+    primary:   '#eef3f7',
+    secondary: '#c5cdd5',
+    muted:     '#6f7a86',
   },
-  border:  '#2e4a35',
+  border:  '#1d232a',
   skeleton: {
-    base:      '#1a2e1f',
-    highlight: '#243d28',
+    base:      '#11161c',
+    highlight: '#1b222a',
   },
 };
 
@@ -92,10 +96,20 @@ export const spacing = {
 };
 
 export const radius = {
+  none: 0,    // brutalist kare köşe
   sm:   6,
   md:   12,
   lg:   16,
   full: 999,
+};
+
+export const fonts = {
+  regular:   'Manrope_400Regular',
+  medium:    'Manrope_500Medium',
+  semibold:  'Manrope_600SemiBold',
+  bold:      'Manrope_700Bold',
+  extrabold: 'Manrope_800ExtraBold',
+  logo:      'Pacifico_400Regular',
 };
 
 export function getRiskColor(score) {
@@ -108,4 +122,11 @@ export function getTrustColor(score) {
   if (score >= 0.7) return palette.trust.high;
   if (score >= 0.4) return palette.trust.medium;
   return palette.trust.low;
+}
+
+// Haber kartı/hero için durum rozeti — nlp_score (sahtelik) ve trust_score'a göre
+export function getVerdict({ nlp_score, trust_score } = {}) {
+  if (nlp_score != null && nlp_score >= 0.6)   return { label: 'ŞÜPHELİ',    color: palette.fake.fill };
+  if (trust_score != null && trust_score >= 0.7) return { label: 'DOĞRULANDI', color: palette.brand.primary };
+  return { label: 'ANALİZ', color: palette.neutral.fill };
 }
