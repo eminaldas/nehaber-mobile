@@ -11,3 +11,13 @@ export async function getNewsDetail(id) {
   const { data } = await api.get(`/news/${id}`);
   return data;
 }
+
+export async function getCachedSummary(id) {
+  const { data } = await api.get(`/news/${id}/summary`);
+  return data; // { summary: string|null, exists: bool }
+}
+
+export async function summarizeNews(id) {
+  const { data } = await api.post(`/news/${id}/summarize`);
+  return data; // { summary: string }
+}
