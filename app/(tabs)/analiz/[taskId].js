@@ -77,7 +77,7 @@ export default function AnalizSonucScreen() {
               )}
             </View>
 
-            <FeedbackBar taskId={taskId} />
+            <FeedbackBar taskId={taskId} prediction={status} />
 
             <Pressable style={[styles.reportBtn, { borderTopColor: colors.border }]} onPress={() => setReportOpen(true)}>
               <Ionicons name="document-text-outline" size={16} color={colors.text.secondary} />

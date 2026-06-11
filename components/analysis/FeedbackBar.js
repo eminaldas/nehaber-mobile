@@ -5,13 +5,22 @@ import { fonts, palette, spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { submitAnalysisFeedback } from '../../services/analysisService';
 
-export default function FeedbackBar({ taskId }) {
+// prediction -> backend'in beklediği etiket ('FAKE' | 'AUTHENTIC')
+function toLabel(pred) {
+  const s = (pred || '').toUpperCase();
+  return ['FAKE', 'FALSE', 'YANILTICI'].includes(s) ? 'FAKE' : 'AUTHENTIC';
+}
+
+export default function FeedbackBar({ taskId, prediction }) {
   const { colors } = useTheme();
   const [state, setState] = useState('idle'); // idle | asking | sent
   const [reason, setReason] = useState('');
 
-  async function send(label) {
+  // "agree" → modelin kararını onayla; "disagree" → karşıt etiketi gönder (düzeltme)
+  async function send(kind) {
     setState('sent');
+    const base = toLabel(prediction);
+    const label = kind === 'agree' ? base : (base === 'FAKE' ? 'AUTHENTIC' : 'FAKE');
     try { await submitAnalysisFeedback(taskId, label); } catch {}
   }
 
@@ -28,7 +37,7 @@ export default function FeedbackBar({ taskId }) {
       <TextInput value={reason} onChangeText={setReason} placeholder="Yazabilirsin…" multiline
         placeholderTextColor={colors.text.muted}
         style={[styles.input, { color: colors.text.primary, borderColor: colors.border, backgroundColor: colors.bg.base }]} />
-      <Pressable style={[styles.submit, { borderColor: palette.brand.primary }]} onPress={() => send('negative')}>
+      <Pressable style={[styles.submit, { borderColor: palette.brand.primary }]} onPress={() => send('disagree')}>
         <Text style={[styles.submitText, { color: palette.brand.primary }]}>GÖNDER</Text>
       </Pressable>
     </View>
@@ -42,7 +51,7 @@ export default function FeedbackBar({ taskId }) {
           <Ionicons name="thumbs-down-outline" size={14} color={colors.text.secondary} />
           <Text style={[styles.btnText, { color: colors.text.secondary }]}>Hayır</Text>
         </Pressable>
-        <Pressable style={[styles.btn, { borderColor: palette.brand.primary, backgroundColor: palette.brand.primary + '22' }]} onPress={() => send('positive')}>
+        <Pressable style={[styles.btn, { borderColor: palette.brand.primary, backgroundColor: palette.brand.primary + '22' }]} onPress={() => send('agree')}>
           <Ionicons name="thumbs-up-outline" size={14} color={palette.brand.primary} />
           <Text style={[styles.btnText, { color: palette.brand.primary }]}>Evet</Text>
         </Pressable>
