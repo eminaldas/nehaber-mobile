@@ -12,6 +12,11 @@ export async function getNewsDetail(id) {
   return data;
 }
 
+export async function getTrending() {
+  const { data } = await api.get('/articles/trending');
+  return data; // TrendingHeadlineResponse[] (max 5): { id, title, status, source_url, source_name, source_domain }
+}
+
 export async function getCachedSummary(id) {
   const { data } = await api.get(`/news/${id}/summary`);
   return data; // { summary: string|null, exists: bool }
