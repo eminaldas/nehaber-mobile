@@ -39,3 +39,9 @@ export async function submitAnalysisFeedback(taskId, label) {
   });
   return data;
 }
+
+// Son N saatte en çok analiz edilen haberler (popüler günlük analizler)
+export async function getHotAnalyses(hours = 24, limit = 8) {
+  const { data } = await api.get('/articles/trending-analyses', { params: { hours, limit } });
+  return data; // { items: [{ task_id, title, request_count, status, confidence, source_url, source_domain }], hours }
+}

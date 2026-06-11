@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AnalysisForm from '../../../components/analysis/AnalysisForm';
+import HotAnalysesCard from '../../../components/analysis/HotAnalysesCard';
 import TrendingToAnalyze from '../../../components/analysis/TrendingToAnalyze';
 import { fonts, palette, spacing } from '../../../constants/theme';
 import { useAnalyzeMutation } from '../../../hooks/useAnalysis';
@@ -44,6 +45,8 @@ export default function AnalizScreen() {
           <AnalysisForm mode={mode} setMode={setMode} text={text} setText={setText}
             url={url} setUrl={setUrl} onSubmit={handleSubmit} loading={isPending} />
         </View>
+
+        <HotAnalysesCard />
 
         <TrendingToAnalyze
           items={trending}
