@@ -11,8 +11,8 @@ import DailySummarySheet from '../../../components/digest/DailySummarySheet';
 import ShimmerCard from '../../../components/ui/ShimmerCard';
 import { fonts, palette, spacing } from '../../../constants/theme';
 import { useNewsFeed } from '../../../hooks/useNewsFeed';
+import { usePopularNews } from '../../../hooks/usePopularNews';
 import { useTheme } from '../../../hooks/useTheme';
-import { useTrending } from '../../../hooks/useTrending';
 
 const CATEGORIES = [
   { label: 'Sizin İçin', value: null },
@@ -66,7 +66,7 @@ export default function HaberlerScreen() {
   const { colors } = useTheme();
   const [category, setCategory] = useState(null);
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, refetch } = useNewsFeed(category);
-  const { data: trending } = useTrending();
+  const { data: trending } = usePopularNews();
 
   const items = data?.pages.flatMap(p => p.items) ?? [];
   const hero  = items[0];

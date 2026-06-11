@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AnalysisForm from '../../../components/analysis/AnalysisForm';
+import TrendingToAnalyze from '../../../components/analysis/TrendingToAnalyze';
 import { fonts, palette, spacing } from '../../../constants/theme';
 import { useAnalyzeMutation } from '../../../hooks/useAnalysis';
 import { useTheme } from '../../../hooks/useTheme';
+import { useTrending } from '../../../hooks/useTrending';
 
 export default function AnalizScreen() {
   const { colors } = useTheme();
@@ -15,6 +17,7 @@ export default function AnalizScreen() {
   const [text, setText] = useState('');
   const [url,  setUrl]  = useState('');
   const { mutate, isPending } = useAnalyzeMutation();
+  const { data: trending } = useTrending();
 
   useEffect(() => {
     if (params.url) { setMode('url'); setUrl(String(params.url)); }
@@ -41,6 +44,11 @@ export default function AnalizScreen() {
           <AnalysisForm mode={mode} setMode={setMode} text={text} setText={setText}
             url={url} setUrl={setUrl} onSubmit={handleSubmit} loading={isPending} />
         </View>
+
+        <TrendingToAnalyze
+          items={trending}
+          onPick={(item) => { setMode('text'); setText(item.title); }}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );

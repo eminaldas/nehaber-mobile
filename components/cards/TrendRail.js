@@ -40,8 +40,7 @@ export default function TrendRail({ items, onOpen }) {
       <View style={styles.head}>
         <Ionicons name="flame" size={15} color={palette.brand.primary} />
         <Text style={[styles.headText, { color: colors.text.primary }]}>TRENDLER</Text>
-        <View style={[styles.liveDot, { backgroundColor: palette.brand.primary }]} />
-        <Text style={[styles.live, { color: palette.brand.primary }]}>CANLI</Text>
+        <Text style={[styles.sub, { color: colors.text.muted }]}>en çok okunan</Text>
       </View>
       <ScrollView
         horizontal
@@ -62,8 +61,7 @@ const styles = StyleSheet.create({
   wrap:    { paddingTop: spacing.md, paddingBottom: spacing.sm },
   head:    { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: spacing.md, marginBottom: spacing.sm },
   headText:{ fontFamily: fonts.extrabold, fontSize: 12, letterSpacing: 2 },
-  liveDot: { width: 6, height: 6, borderRadius: 3, marginLeft: spacing.xs },
-  live:    { fontFamily: fonts.bold, fontSize: 10, letterSpacing: 1.5 },
+  sub:     { fontFamily: fonts.medium, fontSize: 10, letterSpacing: 0.5, marginLeft: spacing.xs, textTransform: 'uppercase' },
   row:     { paddingHorizontal: spacing.md, gap: spacing.sm },
   card:    { width: CARD_W, minHeight: 118, borderWidth: 1, padding: spacing.sm, paddingTop: 10, justifyContent: 'flex-start', overflow: 'hidden' },
   corner:  { position: 'absolute', top: 0, left: 0, width: 14, height: 2 },
