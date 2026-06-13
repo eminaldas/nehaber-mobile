@@ -36,6 +36,13 @@ export const palette = {
     medium: '#d97706',
     low:    '#dc2626',
   },
+  // Analiz verdict renkleri — dark-tema uyumlu (web analysisTheme hex'leri)
+  verdict: {
+    authentic: '#3fff8b',
+    fake:      '#ff7351',
+    iddia:     '#f59e0b',
+    neutral:   '#9aa4ad',
+  },
 };
 
 export const light = {
@@ -130,3 +137,32 @@ export function getVerdict({ nlp_score, trust_score } = {}) {
   if (trust_score != null && trust_score >= 0.7) return { label: 'DOĞRULANDI', color: palette.brand.primary };
   return { label: 'ANALİZ', color: palette.neutral.fill };
 }
+
+// Analiz sonucu durum teması (web analysisTheme.getTheme karşılığı)
+// icon: Ionicons adı
+export function getAnalysisTheme(status) {
+  const s = (status || '').toUpperCase();
+  const isAuthentic = ['AUTHENTIC', 'TRUE', 'GÜVENİLİR', 'REAL'].includes(s);
+  const isFake      = ['FAKE', 'FALSE', 'YANILTICI'].includes(s);
+  const isIddia     = ['IDDIA', 'UNCERTAIN'].includes(s);
+
+  if (isAuthentic) return {
+    hex: palette.verdict.authentic, icon: 'shield-checkmark',
+    label: 'ANALİZ TAMAMLANDI', mainTitle: 'Güvenilir İçerik Tespit Edildi', kind: 'authentic',
+  };
+  if (isFake) return {
+    hex: palette.verdict.fake, icon: 'shield',
+    label: 'RİSK TESPİT EDİLDİ', mainTitle: 'Yüksek Yanıltma Riski Mevcut', kind: 'fake',
+  };
+  if (isIddia) return {
+    hex: palette.verdict.iddia, icon: 'shield-half',
+    label: 'İDDİA TESPİT EDİLDİ', mainTitle: 'İddia / Doğrulanamadı', kind: 'iddia',
+  };
+  return {
+    hex: palette.verdict.neutral, icon: 'shield-outline',
+    label: 'ANALİZ SONUCU', mainTitle: 'Sonuç Belirsiz', kind: 'neutral',
+  };
+}
+
+// hex + alfa yardımcısı (web hex08/hex15/hex30 karşılığı)
+export const alpha = (hex, a) => `${hex}${Math.round(a * 255).toString(16).padStart(2, '0')}`;

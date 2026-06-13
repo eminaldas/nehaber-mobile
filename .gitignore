@@ -47,3 +47,6 @@ yarn-error.*
 navbar-mockup.html
 CLAUDE.md
 AGENTS.md
+
+.superpowers/
+docs/superpowers/

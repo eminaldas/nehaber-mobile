@@ -5,11 +5,13 @@ import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HaberCard from '../../../components/cards/HaberCard';
 import HeroCard from '../../../components/cards/HeroCard';
+import TrendRail from '../../../components/cards/TrendRail';
 import DailySummaryCard from '../../../components/digest/DailySummaryCard';
 import DailySummarySheet from '../../../components/digest/DailySummarySheet';
 import ShimmerCard from '../../../components/ui/ShimmerCard';
 import { fonts, palette, spacing } from '../../../constants/theme';
 import { useNewsFeed } from '../../../hooks/useNewsFeed';
+import { usePopularNews } from '../../../hooks/usePopularNews';
 import { useTheme } from '../../../hooks/useTheme';
 
 const CATEGORIES = [
@@ -64,6 +66,7 @@ export default function HaberlerScreen() {
   const { colors } = useTheme();
   const [category, setCategory] = useState(null);
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, refetch } = useNewsFeed(category);
+  const { data: trending } = usePopularNews();
 
   const items = data?.pages.flatMap(p => p.items) ?? [];
   const hero  = items[0];
@@ -90,6 +93,7 @@ export default function HaberlerScreen() {
           ListHeaderComponent={
             <>
               {hero ? <HeroCard item={hero} onPress={() => open(hero.id)} /> : null}
+              {category === null ? <TrendRail items={trending} onOpen={open} /> : null}
               <DailySummaryCard onPress={() => setDigestOpen(true)} />
             </>
           }

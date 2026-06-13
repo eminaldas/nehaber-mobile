@@ -12,6 +12,18 @@ export async function getNewsDetail(id) {
   return data;
 }
 
+// Popülerlik (kaynak sayısı + tıklanma + tazelik) bazlı trend haberler — gerçek source_url'li
+export async function getPopularNews(size = 5) {
+  const { data } = await api.get('/news', { params: { sort: 'popular', size } });
+  return data.items ?? [];
+}
+
+// Google Trends RSS başlıkları (analiz önerisi için) — Article tablosu, WebView detayı yok
+export async function getTrending() {
+  const { data } = await api.get('/articles/trending');
+  return data; // TrendingHeadlineResponse[] (max 5): { id, title, status, source_url, source_name, source_domain }
+}
+
 export async function getCachedSummary(id) {
   const { data } = await api.get(`/news/${id}/summary`);
   return data; // { summary: string|null, exists: bool }
