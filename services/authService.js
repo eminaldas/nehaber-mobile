@@ -17,6 +17,12 @@ export async function register(payload) {
   return data; // { access_token, token_type, expires_in, user, needs_verification, needs_onboarding }
 }
 
+export async function googleLogin(credential, termsAccepted = true) {
+  // credential: Google OAuth access_token (backend /auth/google -> userinfo ile doğrular)
+  const { data } = await api.post('/auth/google', { credential, terms_accepted: termsAccepted });
+  return data; // { access_token, token_type, expires_in, user, is_new_user, needs_onboarding }
+}
+
 export async function getMe() {
   const { data } = await api.get('/users/me');
   return data; // UserResponse
