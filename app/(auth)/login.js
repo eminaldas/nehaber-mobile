@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
+  ActivityIndicator, KeyboardAvoidingView, Platform,
   Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import AuthField from '../../components/auth/AuthField';
@@ -10,28 +10,31 @@ import GoogleButton from '../../components/auth/GoogleButton';
 import { fonts, palette, radius, spacing } from '../../constants/theme';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
+import { useToast } from '../../hooks/useToast';
 import { login as loginApi } from '../../services/authService';
 
 export default function LoginScreen() {
   const { colors }    = useTheme();
   const { login }     = useAuth();
+  const toast         = useToast();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
 
   async function handleLogin() {
     if (!email.trim() || !password) {
-      Alert.alert('Eksik bilgi', 'E-posta ve şifre gerekli.');
+      toast.error('E-posta ve şifre gerekli.', { title: 'Eksik bilgi' });
       return;
     }
     setLoading(true);
     try {
       const data = await loginApi(email.trim().toLowerCase(), password);
       await login(data.access_token, { email: email.trim().toLowerCase() });
+      toast.success('Giriş başarılı, yönlendiriliyorsun…', { title: 'Hoş geldin!' });
       router.replace('/(tabs)/haberler');
     } catch (err) {
       const msg = err.response?.data?.detail ?? 'Giriş başarısız.';
-      Alert.alert('Giriş Hatası', msg);
+      toast.error(msg, { title: 'Giriş yapılamadı' });
     } finally {
       setLoading(false);
     }
@@ -40,7 +43,7 @@ export default function LoginScreen() {
   function handleGoogle() {
     // TODO: expo-auth-session ile Google access_token al → googleLogin(token) → /auth/google.
     // Gerçek akış için Google Cloud OAuth client ID'leri gerekli.
-    Alert.alert('Google ile giriş', 'Google girişi yakında aktif olacak.');
+    toast.info('Google ile giriş çok yakında aktif olacak.', { title: 'Yakında' });
   }
 
   return (
@@ -80,7 +83,7 @@ export default function LoginScreen() {
           autoCapitalize="none"
         />
 
-        <Pressable onPress={() => Alert.alert('Şifre sıfırlama', 'Şifre sıfırlama yakında eklenecek.')}>
+        <Pressable onPress={() => toast.info('Şifre sıfırlama yakında eklenecek.', { title: 'Yakında' })}>
           <Text style={[styles.forgot, { color: colors.text.muted }]}>Şifreni mi unuttun?</Text>
         </Pressable>
 

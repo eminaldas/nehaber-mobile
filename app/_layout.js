@@ -12,6 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { dark } from '../constants/theme';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
+import { ToastProvider } from '../context/ToastContext';
 import { WebSocketProvider } from '../context/WebSocketContext';
 import { useAuth } from '../hooks/useAuth';
 
@@ -46,10 +47,12 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ThemeProvider>
-            <WsWrapper>
-              <StatusBar style="auto" />
-              <Stack screenOptions={{ headerShown: false }} />
-            </WsWrapper>
+            <ToastProvider>
+              <WsWrapper>
+                <StatusBar style="auto" />
+                <Stack screenOptions={{ headerShown: false }} />
+              </WsWrapper>
+            </ToastProvider>
           </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>

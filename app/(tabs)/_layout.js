@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GlassTabBarBackground from '../../components/navigation/GlassTabBarBackground';
 import { palette } from '../../constants/theme';
+import { useTheme } from '../../hooks/useTheme';
 
 const ICONS = {
   haberler: { on: 'newspaper',           off: 'newspaper-outline' },
@@ -14,13 +15,14 @@ const ICONS = {
 };
 
 function TabIcon({ focused, name }) {
+  const { colors } = useTheme();
   const cfg = ICONS[name];
   return (
     <View style={styles.iconWrap}>
       <Ionicons
         name={focused ? cfg.on : cfg.off}
         size={22}
-        color={focused ? palette.brand.bright : '#eef3f7'}
+        color={focused ? palette.brand.bright : colors.text.muted}
       />
     </View>
   );

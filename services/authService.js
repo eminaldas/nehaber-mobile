@@ -17,6 +17,23 @@ export async function register(payload) {
   return data; // { access_token, token_type, expires_in, user, needs_verification, needs_onboarding }
 }
 
+export async function updateProfile(payload) {
+  // payload: { username?, bio?, avatar_url?, social_links?, current_password?, new_password? }
+  const { data } = await api.patch('/auth/me', payload);
+  return data; // UserResponse
+}
+
+export async function deleteAccount(password) {
+  const { data } = await api.delete('/auth/me', { data: { password } });
+  return data;
+}
+
+export async function completeOnboarding(payload) {
+  // payload: { interests: string[], marketing_source?, avatar_url?, username? }
+  const { data } = await api.put('/auth/complete-onboarding', payload);
+  return data; // UserResponse
+}
+
 export async function googleLogin(credential, termsAccepted = true) {
   // credential: Google OAuth access_token (backend /auth/google -> userinfo ile doğrular)
   const { data } = await api.post('/auth/google', { credential, terms_accepted: termsAccepted });
@@ -24,6 +41,6 @@ export async function googleLogin(credential, termsAccepted = true) {
 }
 
 export async function getMe() {
-  const { data } = await api.get('/users/me');
+  const { data } = await api.get('/auth/me');
   return data; // UserResponse
 }

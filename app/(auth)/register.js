@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
+  ActivityIndicator, KeyboardAvoidingView, Platform,
   Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import AuthField from '../../components/auth/AuthField';
@@ -10,11 +10,13 @@ import GoogleButton from '../../components/auth/GoogleButton';
 import { fonts, palette, radius, spacing } from '../../constants/theme';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
+import { useToast } from '../../hooks/useToast';
 import { register as registerApi } from '../../services/authService';
 
 export default function RegisterScreen() {
   const { colors }  = useTheme();
   const { login }   = useAuth();
+  const toast       = useToast();
   const [form, setForm]       = useState({ email: '', username: '', password: '' });
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +26,7 @@ export default function RegisterScreen() {
 
   async function handleRegister() {
     if (!form.email || !form.username || !form.password) {
-      Alert.alert('Eksik bilgi', 'Tüm alanlar zorunlu.');
+      toast.error('Tüm alanlar zorunlu.', { title: 'Eksik bilgi' });
       return;
     }
     setLoading(true);
@@ -36,13 +38,14 @@ export default function RegisterScreen() {
         terms_accepted: true,
       });
       await login(data.access_token, data.user);
-      router.replace('/(tabs)/haberler');
+      toast.success('Hesabın oluşturuldu, hoş geldin!', { title: 'Kayıt başarılı' });
+      router.replace('/onboarding');
     } catch (err) {
       const detail = err.response?.data?.detail;
       const msg = Array.isArray(detail)
         ? detail.map(d => d.msg).join('\n')
         : (detail ?? 'Kayıt başarısız.');
-      Alert.alert('Kayıt Hatası', msg);
+      toast.error(msg, { title: 'Kayıt yapılamadı' });
     } finally {
       setLoading(false);
     }
@@ -50,7 +53,7 @@ export default function RegisterScreen() {
 
   function handleGoogle() {
     // TODO: expo-auth-session ile Google access_token al → googleLogin(token) → /auth/google.
-    Alert.alert('Google ile kayıt', 'Google girişi yakında aktif olacak.');
+    toast.info('Google ile giriş çok yakında aktif olacak.', { title: 'Yakında' });
   }
 
   return (

@@ -18,7 +18,16 @@ export function ThemeProvider({ children }) {
     });
   }, [isDark]);
 
-  const value = useMemo(() => ({ isDark, colors, toggleTheme }), [isDark, colors, toggleTheme]);
+  // mode: 'system' | 'dark' | 'light'
+  const mode = override ?? 'system';
+  const setMode = useCallback((m) => {
+    setOverride(m === 'system' ? null : m);
+  }, []);
+
+  const value = useMemo(
+    () => ({ isDark, colors, toggleTheme, mode, setMode }),
+    [isDark, colors, toggleTheme, mode, setMode],
+  );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
