@@ -11,7 +11,7 @@ import { palette } from '../../../constants/theme';
 import { useTheme } from '../../../hooks/useTheme';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../hooks/useToast';
-import { useThreads, useVote, useBookmarkToggle } from '../../../hooks/useForum';
+import { useThreads, useBookmarkToggle } from '../../../hooks/useForum';
 
 export default function ForumScreen() {
   const { colors } = useTheme();
