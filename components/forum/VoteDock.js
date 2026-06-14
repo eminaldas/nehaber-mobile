@@ -7,6 +7,7 @@ import VoteControl from './VoteControl';
 import Icon from '../ui/Icon';
 import { useTheme } from '../../hooks/useTheme';
 import { VERDICT_MAP } from '../../constants/forum';
+import { fonts } from '../../constants/theme';
 
 export default function VoteDock({ thread, onVote, onComment }) {
   const { colors, isDark } = useTheme();
@@ -41,5 +42,5 @@ const styles = StyleSheet.create({
   row:      { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 9 },
   cbtn:     { width: 42, height: 40, borderWidth: 1, borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
   resolved: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
-  resolvedT:{ fontSize: 12, fontWeight: '700' },
+  resolvedT:{ fontSize: 12, fontFamily: fonts.bold },
 });

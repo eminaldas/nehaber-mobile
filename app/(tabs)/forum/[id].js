@@ -14,7 +14,7 @@ import CommentTree from '../../../components/forum/CommentTree';
 import FeaturedEvidence from '../../../components/forum/FeaturedEvidence';
 import ForumActionSheet, { shareThread } from '../../../components/forum/ForumActionSheet';
 import LoginNudgeSheet from '../../../components/ui/LoginNudgeSheet';
-import { palette } from '../../../constants/theme';
+import { palette, fonts } from '../../../constants/theme';
 import { useTheme } from '../../../hooks/useTheme';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../hooks/useToast';
@@ -159,15 +159,15 @@ const styles = StyleSheet.create({
   loader:  { flex: 1, alignItems: 'center', justifyContent: 'center' },
   nav:     { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
   bk:      { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  bkt:     { fontSize: 12, fontWeight: '700' },
+  bkt:     { fontSize: 12, fontFamily: fonts.bold },
   sp:      { flexDirection: 'row', gap: 16, marginLeft: 'auto' },
   metaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  title:   { fontSize: 19, fontWeight: '800', lineHeight: 25, marginBottom: 12 },
+  title:   { fontSize: 19, fontFamily: fonts.extrabold, lineHeight: 25, marginBottom: 12 },
   auth:    { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
-  nm:      { fontSize: 12, fontWeight: '700' },
-  dt:      { fontSize: 11, fontWeight: '600' },
+  nm:      { fontSize: 12, fontFamily: fonts.bold },
+  dt:      { fontSize: 11, fontFamily: fonts.semibold },
   body:    { fontSize: 13, lineHeight: 21, borderLeftWidth: 2, paddingLeft: 11, marginBottom: 14 },
   tags:    { flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 14 },
-  tag:     { fontSize: 10, fontWeight: '600', paddingHorizontal: 7, paddingVertical: 4, borderRadius: 3 },
-  section: { fontSize: 13, fontWeight: '800', marginTop: 4 },
+  tag:     { fontSize: 10, fontFamily: fonts.semibold, paddingHorizontal: 7, paddingVertical: 4, borderRadius: 3 },
+  section: { fontSize: 13, fontFamily: fonts.extrabold, marginTop: 4 },
 });

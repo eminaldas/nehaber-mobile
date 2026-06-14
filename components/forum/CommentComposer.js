@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Avatar from './Avatar';
 import Icon from '../ui/Icon';
-import { palette } from '../../constants/theme';
+import { palette, fonts } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -44,7 +44,7 @@ export default function CommentComposer({ replyTo, onCancelReply, onSubmit, subm
 }
 const styles = StyleSheet.create({
   reply:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 6, marginBottom: 8 },
-  replyT: { fontSize: 11, fontWeight: '600' },
+  replyT: { fontSize: 11, fontFamily: fonts.semibold },
   row:    { flexDirection: 'row', alignItems: 'flex-end', gap: 9 },
   in:     { flex: 1, borderWidth: 1, borderRadius: 6, paddingHorizontal: 12, paddingVertical: 10, fontSize: 12.5, maxHeight: 100 },
   snd:    { width: 38, height: 38, borderRadius: 6, alignItems: 'center', justifyContent: 'center' },

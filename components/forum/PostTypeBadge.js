@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { POST_TYPE_MAP } from '../../constants/forum';
-import { alpha } from '../../constants/theme';
+import { alpha, fonts } from '../../constants/theme';
 
 export default function PostTypeBadge({ type }) {
   const t = POST_TYPE_MAP[type] || POST_TYPE_MAP.iddia;
@@ -13,5 +13,5 @@ export default function PostTypeBadge({ type }) {
 }
 const styles = StyleSheet.create({
   b: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: 4 },
-  t: { fontSize: 10, fontWeight: '700', letterSpacing: 0.3 },
+  t: { fontSize: 10, fontFamily: fonts.bold, letterSpacing: 0.3 },
 });

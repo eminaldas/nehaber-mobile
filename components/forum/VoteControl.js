@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Icon from '../ui/Icon';
 import { useTheme } from '../../hooks/useTheme';
-import { alpha } from '../../constants/theme';
+import { alpha, fonts } from '../../constants/theme';
 
 // thread: { post_type, vote_suspicious, vote_authentic, vote_investigate, current_user_vote }
 // onVote(voteType); compact: kart içi küçük varyant
@@ -52,5 +52,5 @@ const styles = StyleSheet.create({
   row:   { flexDirection: 'row', gap: 7 },
   chip:  { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, paddingVertical: 6, borderWidth: 1, borderRadius: 4 },
   chipCompact: { paddingHorizontal: 8, paddingVertical: 5 },
-  count: { fontSize: 11, fontWeight: '800' },
+  count: { fontSize: 11, fontFamily: fonts.extrabold },
 });

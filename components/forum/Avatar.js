@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { fonts } from '../../constants/theme';
 
 const GRADS = [
   ['#3fff8b', '#10b981'], ['#60a5fa', '#3b82f6'], ['#c084fc', '#a855f7'],
@@ -27,5 +28,5 @@ export default function Avatar({ username = '?', uri = null, size = 26 }) {
 
 const styles = StyleSheet.create({
   c: { alignItems: 'center', justifyContent: 'center' },
-  t: { color: '#06080b', fontWeight: '800' },
+  t: { color: '#06080b', fontFamily: fonts.extrabold },
 });

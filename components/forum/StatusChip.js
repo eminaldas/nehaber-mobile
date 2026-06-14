@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { STATUS_MAP } from '../../constants/forum';
-import { alpha } from '../../constants/theme';
+import { alpha, fonts } from '../../constants/theme';
 
 export default function StatusChip({ status }) {
   const s = STATUS_MAP[status];
@@ -14,5 +14,5 @@ export default function StatusChip({ status }) {
 }
 const styles = StyleSheet.create({
   b: { paddingHorizontal: 7, paddingVertical: 4, borderRadius: 3, borderWidth: 1 },
-  t: { fontSize: 9, fontWeight: '700', letterSpacing: 0.4 },
+  t: { fontSize: 9, fontFamily: fonts.bold, letterSpacing: 0.4 },
 });

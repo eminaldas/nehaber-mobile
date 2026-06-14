@@ -5,6 +5,7 @@ import Icon from '../ui/Icon';
 import { useTheme } from '../../hooks/useTheme';
 import { timeAgo } from '../../lib/forum/format';
 import { TRUST_BADGE } from '../../constants/forum';
+import { fonts } from '../../constants/theme';
 
 export default function CommentItem({ comment, isAuthor, onReply, onHelpful, onReport, depth = 0 }) {
   const { colors } = useTheme();
@@ -55,14 +56,14 @@ export default function CommentItem({ comment, isAuthor, onReply, onHelpful, onR
 const styles = StyleSheet.create({
   c:     { paddingVertical: 12 },
   head:  { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 6 },
-  nm:    { fontSize: 11.5, fontWeight: '700' },
-  badge: { fontSize: 8, fontWeight: '700', textTransform: 'uppercase', borderWidth: 1, borderRadius: 3, paddingHorizontal: 5, paddingVertical: 2 },
-  dt:    { fontSize: 10, fontWeight: '600', marginLeft: 'auto' },
+  nm:    { fontSize: 11.5, fontFamily: fonts.bold },
+  badge: { fontSize: 8, fontFamily: fonts.bold, textTransform: 'uppercase', borderWidth: 1, borderRadius: 3, paddingHorizontal: 5, paddingVertical: 2 },
+  dt:    { fontSize: 10, fontFamily: fonts.semibold, marginLeft: 'auto' },
   tx:    { fontSize: 12.5, lineHeight: 19, marginBottom: 8 },
   flag:  { fontSize: 10, color: '#f59e0b', marginBottom: 8 },
   src:   { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 4, marginBottom: 9, maxWidth: '90%' },
-  srcT:  { color: '#60a5fa', fontSize: 10, fontWeight: '700', flexShrink: 1 },
+  srcT:  { color: '#60a5fa', fontSize: 10, fontFamily: fonts.bold, flexShrink: 1 },
   acts:  { flexDirection: 'row', gap: 16 },
   a:     { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  at:    { fontSize: 10.5, fontWeight: '700' },
+  at:    { fontSize: 10.5, fontFamily: fonts.bold },
 });

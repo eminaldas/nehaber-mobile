@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Icon from '../ui/Icon';
-import { alpha } from '../../constants/theme';
+import { alpha, fonts } from '../../constants/theme';
 
 // article.ai_verdict 'FAKE' | 'AUTHENTIC'; confidence 0..1
 export default function AIChip({ verdict, confidence }) {
@@ -20,5 +20,5 @@ export default function AIChip({ verdict, confidence }) {
 }
 const styles = StyleSheet.create({
   b: { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-  t: { fontSize: 10, fontWeight: '700' },
+  t: { fontSize: 10, fontFamily: fonts.bold },
 });

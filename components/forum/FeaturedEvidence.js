@@ -3,6 +3,7 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import Avatar from './Avatar';
 import Icon from '../ui/Icon';
 import { useTheme } from '../../hooks/useTheme';
+import { fonts } from '../../constants/theme';
 
 export default function FeaturedEvidence({ comment }) {
   const { colors } = useTheme();
@@ -31,10 +32,10 @@ export default function FeaturedEvidence({ comment }) {
 const styles = StyleSheet.create({
   c:    { backgroundColor: 'rgba(16,185,129,0.055)', borderRadius: 10, padding: 13, marginBottom: 14 },
   lab:  { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 9 },
-  labT: { color: '#6ee7b7', fontSize: 9, fontWeight: '800', letterSpacing: 0.5 },
+  labT: { color: '#6ee7b7', fontSize: 9, fontFamily: fonts.extrabold, letterSpacing: 0.5 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 8 },
-  nm:   { fontSize: 11, fontWeight: '700' },
+  nm:   { fontSize: 11, fontFamily: fonts.bold },
   tx:   { fontSize: 12, lineHeight: 18, marginBottom: 9 },
   row:  { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  act:  { color: '#60a5fa', fontSize: 10, fontWeight: '700' },
+  act:  { color: '#60a5fa', fontSize: 10, fontFamily: fonts.bold },
 });

@@ -8,6 +8,7 @@ import VoteControl from './VoteControl';
 import { useTheme } from '../../hooks/useTheme';
 import { timeAgo, voteDistribution } from '../../lib/forum/format';
 import { VOTE_COLORS } from '../../constants/forum';
+import { fonts } from '../../constants/theme';
 
 function accentColor(thread) {
   const { sPct, aPct, iPct } = voteDistribution(thread);
@@ -61,11 +62,11 @@ const styles = StyleSheet.create({
   item:  { paddingVertical: 14, paddingLeft: 18, paddingRight: 16, borderTopWidth: 1, position: 'relative' },
   accent:{ position: 'absolute', left: 0, top: 14, bottom: 14, width: 2, borderRadius: 2 },
   top:   { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 9 },
-  who:   { fontSize: 12, fontWeight: '700' },
+  who:   { fontSize: 12, fontFamily: fonts.bold },
   dot:   { fontSize: 11 },
-  time:  { fontSize: 11, fontWeight: '600' },
-  title: { fontSize: 14.5, fontWeight: '700', lineHeight: 20, marginBottom: 9 },
+  time:  { fontSize: 11, fontFamily: fonts.semibold },
+  title: { fontSize: 14.5, fontFamily: fonts.bold, lineHeight: 20, marginBottom: 9 },
   foot:  { flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 11 },
   f:     { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  ft:    { fontSize: 11, fontWeight: '700' },
+  ft:    { fontSize: 11, fontFamily: fonts.bold },
 });

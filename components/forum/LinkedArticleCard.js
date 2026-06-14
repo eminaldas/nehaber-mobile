@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import Icon from '../ui/Icon';
-import { alpha } from '../../constants/theme';
+import { alpha, fonts } from '../../constants/theme';
 
 export default function LinkedArticleCard({ article }) {
   if (!article) return null;
@@ -24,6 +24,6 @@ export default function LinkedArticleCard({ article }) {
 const styles = StyleSheet.create({
   c:   { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderWidth: 1, borderRadius: 6, marginBottom: 14 },
   th:  { width: 42, height: 42, borderRadius: 4 },
-  ti:  { color: '#eef3f7', fontSize: 11.5, fontWeight: '700', lineHeight: 16 },
-  src: { color: '#9aa4ad', fontSize: 10, fontWeight: '600', marginTop: 4 },
+  ti:  { color: '#eef3f7', fontSize: 11.5, fontFamily: fonts.bold, lineHeight: 16 },
+  src: { color: '#9aa4ad', fontSize: 10, fontFamily: fonts.semibold, marginTop: 4 },
 });

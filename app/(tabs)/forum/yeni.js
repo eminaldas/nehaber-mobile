@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '../../../components/ui/Icon';
 import CreateThreadForm from '../../../components/forum/CreateThreadForm';
-import { palette } from '../../../constants/theme';
+import { palette, fonts } from '../../../constants/theme';
 import { useTheme } from '../../../hooks/useTheme';
 import { useToast } from '../../../hooks/useToast';
 import { useCreateThread } from '../../../hooks/useForum';
@@ -44,7 +44,7 @@ export default function NewThreadScreen() {
 }
 const styles = StyleSheet.create({
   nav: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
-  ti:  { fontSize: 14, fontWeight: '800', marginLeft: 12 },
+  ti:  { fontSize: 14, fontFamily: fonts.extrabold, marginLeft: 12 },
   sub: { marginLeft: 'auto', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6 },
-  subT:{ color: '#06080b', fontSize: 11, fontWeight: '800', letterSpacing: 0.3 },
+  subT:{ color: '#06080b', fontSize: 11, fontFamily: fonts.extrabold, letterSpacing: 0.3 },
 });

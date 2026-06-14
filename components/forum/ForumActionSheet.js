@@ -3,6 +3,7 @@ import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import BottomSheet from '../ui/BottomSheet';
 import Icon from '../ui/Icon';
 import { useTheme } from '../../hooks/useTheme';
+import { fonts } from '../../constants/theme';
 
 // actions: [{ key, label, icon, danger?, onPress }]
 export default function ForumActionSheet({ visible, onClose, actions }) {
@@ -29,5 +30,5 @@ export async function shareThread(thread) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
-  t:   { fontSize: 15, fontWeight: '600' },
+  t:   { fontSize: 15, fontFamily: fonts.semibold },
 });

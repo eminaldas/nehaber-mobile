@@ -3,7 +3,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import * as ImagePicker from 'expo-image-picker';
 import Icon from '../ui/Icon';
 import { POST_TYPES, FORUM_CATEGORIES } from '../../constants/forum';
-import { palette, alpha } from '../../constants/theme';
+import { palette, alpha, fonts } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 
 export default function CreateThreadForm({ value, onChange }) {
@@ -112,18 +112,18 @@ export default function CreateThreadForm({ value, onChange }) {
 }
 const styles = StyleSheet.create({
   sect:  { marginBottom: 18 },
-  lab:   { fontSize: 10, fontWeight: '700', letterSpacing: 0.6, marginBottom: 9 },
+  lab:   { fontSize: 10, fontFamily: fonts.bold, letterSpacing: 0.6, marginBottom: 9 },
   types: { flexDirection: 'row', gap: 8 },
   ty:    { flex: 1, borderWidth: 1, borderRadius: 8, padding: 11, alignItems: 'center', gap: 6 },
-  tyNm:  { fontSize: 12, fontWeight: '800' },
-  tyDs:  { fontSize: 9, fontWeight: '600', textAlign: 'center' },
-  inp:   { borderWidth: 1, borderRadius: 7, padding: 13, fontSize: 15, fontWeight: '700' },
+  tyNm:  { fontSize: 12, fontFamily: fonts.extrabold },
+  tyDs:  { fontSize: 9, fontFamily: fonts.semibold, textAlign: 'center' },
+  inp:   { borderWidth: 1, borderRadius: 7, padding: 13, fontSize: 15, fontFamily: fonts.bold },
   area:  { borderWidth: 1, borderRadius: 7, padding: 13, fontSize: 13, minHeight: 80, textAlignVertical: 'top' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, alignItems: 'center' },
   chip:  { borderWidth: 1, borderRadius: 5, paddingHorizontal: 12, paddingVertical: 8 },
-  chipT: { fontSize: 11, fontWeight: '700' },
+  chipT: { fontSize: 11, fontFamily: fonts.bold },
   tg:    { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 5 },
-  tgT:   { color: '#3fff8b', fontSize: 11, fontWeight: '700' },
+  tgT:   { color: '#3fff8b', fontSize: 11, fontFamily: fonts.bold },
   tagIn: { minWidth: 80, fontSize: 12, paddingVertical: 7 },
   attach:{ flexDirection: 'row', gap: 9 },
   thumbW:{ position: 'relative' },
@@ -131,5 +131,5 @@ const styles = StyleSheet.create({
   rm:    { position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: 9, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' },
   imgbox:{ width: 60, height: 60, borderWidth: 1, borderStyle: 'dashed', borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
   note:  { flexDirection: 'row', gap: 8, padding: 11, borderRadius: 7 },
-  noteT: { flex: 1, fontSize: 10.5, lineHeight: 15, color: '#d6a64f', fontWeight: '600' },
+  noteT: { flex: 1, fontSize: 10.5, lineHeight: 15, color: '#d6a64f', fontFamily: fonts.semibold },
 });
