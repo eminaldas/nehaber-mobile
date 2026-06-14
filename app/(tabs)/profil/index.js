@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CornerBrackets from '../../../components/analysis/CornerBrackets';
 import BottomSheet from '../../../components/ui/BottomSheet';
 import AppHeader from '../../../components/ui/AppHeader';
+import SettingsMenu from '../../../components/profile/SettingsMenu';
 import { fonts, getAnalysisTheme, palette, radius, spacing } from '../../../constants/theme';
 import { useAuth } from '../../../hooks/useAuth';
 import { useTheme } from '../../../hooks/useTheme';
@@ -38,6 +39,7 @@ export default function ProfilScreen() {
   const { isAuth, user } = useAuth();
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const { data: me }    = useQuery({ queryKey: ['me'], queryFn: getMe, enabled: isAuth });
   const { data: stats } = useQuery({ queryKey: ['user-stats'], queryFn: async () => (await api.get('/users/me/stats')).data, enabled: isAuth });
@@ -87,8 +89,11 @@ export default function ProfilScreen() {
       <AppHeader
         sectionIcon="person-outline"
         rightIcon="settings-outline"
-        onRight={() => router.push('/(tabs)/profil/ayarlar')}
+        onRight={() => setSettingsOpen(true)}
+        sub={settingsOpen ? { title: 'Ayarlar' } : null}
+        onBack={() => setSettingsOpen(false)}
       />
+      {settingsOpen ? <SettingsMenu /> : (
       <ScrollView style={{ flex: 1, backgroundColor: colors.bg.base }} contentContainerStyle={{ paddingBottom: 120 }}>
 
         {/* Odaklanma kutusu */}
@@ -212,6 +217,7 @@ export default function ProfilScreen() {
           })}
         </View>
       </ScrollView>
+      )}
 
       {/* Analiz detay sheet */}
       <BottomSheet visible={!!selected} onClose={() => setSelected(null)}>

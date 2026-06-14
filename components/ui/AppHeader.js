@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AuroraGlow from './AuroraGlow';
-import { fonts, spacing } from '../../constants/theme';
+import { fonts, palette, spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 
 /**
@@ -83,13 +83,23 @@ export default function AppHeader({
           </Animated.View>
         </Pressable>
 
-        {rightIcon ? (
-          <Animated.View style={{ opacity: rightO }}>
-            <Pressable hitSlop={12} onPress={onRight} disabled={active}>
-              <Ionicons name={rightIcon} size={23} color={colors.text.secondary} />
-            </Pressable>
-          </Animated.View>
-        ) : <View style={styles.side} />}
+        <View style={styles.rightSlot}>
+          {rightIcon ? (
+            <Animated.View style={[styles.rabs, { opacity: rightO }]} pointerEvents={active ? 'none' : 'auto'}>
+              <Pressable hitSlop={12} onPress={onRight}>
+                <Ionicons name={rightIcon} size={23} color={colors.text.secondary} />
+              </Pressable>
+            </Animated.View>
+          ) : null}
+          {sub?.action ? (
+            <Animated.View style={[styles.rabs, { opacity: subV }]} pointerEvents={sub ? 'auto' : 'none'}>
+              <Pressable onPress={sub.action.onPress} disabled={sub.action.disabled}
+                style={[styles.actBtn, { backgroundColor: palette.brand.primary, opacity: sub.action.disabled ? 0.45 : 1 }]}>
+                <Text style={styles.actTxt}>{sub.action.label}</Text>
+              </Pressable>
+            </Animated.View>
+          ) : null}
+        </View>
       </View>
 
       {/* arama girişi (genişler) */}
@@ -125,6 +135,10 @@ const styles = StyleSheet.create({
   toprow: { position: 'absolute', left: 0, right: 0, paddingHorizontal: spacing.md, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', zIndex: 3 },
   side:   { width: 40, height: 30, justifyContent: 'center' },
   abs:    { position: 'absolute' },
+  rightSlot: { minWidth: 40, height: 30, alignItems: 'flex-end', justifyContent: 'center' },
+  rabs:   { position: 'absolute', right: 0 },
+  actBtn: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 4 },
+  actTxt: { fontFamily: fonts.extrabold, fontSize: 12, color: '#06080b', letterSpacing: 0.3 },
   sfield: { position: 'absolute', left: spacing.md, right: spacing.md, height: 40, flexDirection: 'row', alignItems: 'center', gap: 9, borderWidth: 1, borderRadius: 4, paddingHorizontal: 12, zIndex: 2 },
   input:  { flex: 1, fontFamily: fonts.medium, fontSize: 14, padding: 0 },
 });
