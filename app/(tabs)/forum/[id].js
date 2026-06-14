@@ -1,25 +1,57 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Avatar from '../../../components/forum/Avatar';
+import Icon from '../../../components/ui/Icon';
+import PostTypeBadge from '../../../components/forum/PostTypeBadge';
+import StatusChip from '../../../components/forum/StatusChip';
+import AIChip from '../../../components/forum/AIChip';
+import LinkedArticleCard from '../../../components/forum/LinkedArticleCard';
+import VoteDock from '../../../components/forum/VoteDock';
+import CommentComposer from '../../../components/forum/CommentComposer';
+import CommentTree from '../../../components/forum/CommentTree';
+import FeaturedEvidence from '../../../components/forum/FeaturedEvidence';
+import ForumActionSheet, { shareThread } from '../../../components/forum/ForumActionSheet';
 import LoginNudgeSheet from '../../../components/ui/LoginNudgeSheet';
-import { palette, radius, spacing, typography } from '../../../constants/theme';
-import { useAuth } from '../../../hooks/useAuth';
+import { palette } from '../../../constants/theme';
 import { useTheme } from '../../../hooks/useTheme';
-import { getThreadDetail } from '../../../services/forumService';
+import { useAuth } from '../../../hooks/useAuth';
+import { useToast } from '../../../hooks/useToast';
+import {
+  useThread, useVote, useAddComment, useHelpful,
+  useReportComment, useReportThread, useDeleteThread,
+} from '../../../hooks/useForum';
+import { timeAgo } from '../../../lib/forum/format';
+import ws from '../../../services/wsService';
 
-export default function ForumDetayScreen() {
-  const { id }               = useLocalSearchParams();
-  const { colors }           = useTheme();
-  const { isAuth }           = useAuth();
-  const [nudge, setNudge]    = useState(false);
+export default function ForumDetailScreen() {
+  const { id } = useLocalSearchParams();
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { isAuth, user } = useAuth();
+  const toast = useToast();
 
-  const { data: thread, isLoading } = useQuery({
-    queryKey: ['forum-thread', id],
-    queryFn:  () => getThreadDetail(id),
-  });
+  const { data: thread, isLoading, refetch: refetchThread } = useThread(id);
+  const vote = useVote(id);
+  const addComment = useAddComment(id);
+  const helpful = useHelpful(id);
+  const reportComment = useReportComment();
+  const reportThreadM = useReportThread();
+  const deleteThreadM = useDeleteThread();
 
-  if (isLoading) {
+  const [nudge, setNudge] = useState(false);
+  const [replyTo, setReplyTo] = useState(null);
+  const [menu, setMenu] = useState(false);
+
+  useEffect(() => {
+    const unsub = ws.subscribe('forum.new_comment', (msg) => {
+      if (msg?.payload?.thread_id === String(id)) refetchThread();
+    });
+    return unsub;
+  }, [id, refetchThread]);
+
+  if (isLoading || !thread) {
     return (
       <View style={[styles.loader, { backgroundColor: colors.bg.base }]}>
         <ActivityIndicator color={palette.brand.primary} size="large" />
@@ -27,75 +59,115 @@ export default function ForumDetayScreen() {
     );
   }
 
-  const total = (thread?.vote_suspicious ?? 0) + (thread?.vote_authentic ?? 0) + (thread?.vote_investigate ?? 0);
+  const isNews = thread.article_id != null;
+  const isOwner = isAuth && user?.id === thread.author?.id;
+
+  const onVote = (vt) => {
+    if (!isAuth) return setNudge(true);
+    vote.mutate(vt, {
+      onError: (e) => toast.error(e?.response?.status === 409 ? 'Tartışma sonuçlandı, oy verilemez' : 'Oy gönderilemedi'),
+    });
+  };
+  const submitComment = (body) => {
+    if (!isAuth) return setNudge(true);
+    addComment.mutate({ body, parentId: replyTo?.id }, {
+      onSuccess: ({ flagged }) => { setReplyTo(null); if (flagged) toast.info('Yorumun incelemeye alındı'); },
+      onError: (e) => toast.error(e?.response?.status === 422 ? 'İçerik politikalara aykırı' : 'Yorum gönderilemedi'),
+    });
+  };
+  const onHelpful = (c) => { if (!isAuth) return setNudge(true); helpful.mutate(c.id); };
+  const onReport = (c) => {
+    if (!isAuth) return setNudge(true);
+    reportComment.mutate({ id: c.id, reason: 'spam' }, {
+      onSuccess: () => toast.success('Bildirimin alındı'),
+      onError: () => toast.error('Gönderilemedi'),
+    });
+  };
+
+  const menuActions = isOwner
+    ? [{ key: 'delete', label: 'Sil', icon: 'x', danger: true, onPress: () =>
+        deleteThreadM.mutate(id, { onSuccess: () => { toast.success('Silindi'); router.back(); }, onError: () => toast.error('Silinemedi') }) }]
+    : [{ key: 'report', label: 'Bildir', icon: 'flag', onPress: () =>
+        reportThreadM.mutate({ id, reason: 'spam' }, { onSuccess: () => toast.success('Bildirimin alındı'), onError: () => toast.error('Gönderilemedi') }) }];
 
   return (
-    <>
-      <ScrollView style={{ flex:1, backgroundColor: colors.bg.base }} contentContainerStyle={styles.content}>
-        <Pressable style={styles.back} onPress={() => router.back()}>
-          <Text style={{ color: palette.brand.primary }}>← Forum</Text>
+    <View style={{ flex: 1, backgroundColor: colors.bg.base }}>
+      <View style={[styles.nav, { paddingTop: insets.top + 4, borderBottomColor: colors.border }]}>
+        <Pressable style={styles.bk} onPress={() => router.back()} hitSlop={8}>
+          <Icon name="arrow-left" size={16} color={colors.text.secondary} strokeWidth={2.2} />
+          <Text style={[styles.bkt, { color: colors.text.secondary }]}>Forum</Text>
         </Pressable>
+        <View style={styles.sp}>
+          <Pressable onPress={() => shareThread(thread)} hitSlop={8}><Icon name="share" size={17} color={colors.text.muted} /></Pressable>
+          <Pressable onPress={() => setMenu(true)} hitSlop={8}><Icon name="dots" size={17} color={colors.text.muted} /></Pressable>
+        </View>
+      </View>
 
-        {thread?.category && (
-          <View style={[styles.catBadge, { backgroundColor: palette.brand.accent }]}>
-            <Text style={[styles.catText, { color: palette.brand.primary }]}>{thread.category}</Text>
-          </View>
-        )}
-
-        <Text style={[styles.title, { color: colors.text.primary }]}>{thread?.title}</Text>
-
-        <View style={styles.votesRow}>
-          <Text style={{ color: colors.text.muted, fontSize: typography.xs }}>
-            🚩 {thread?.vote_suspicious ?? 0} şüpheli  •  ✅ {thread?.vote_authentic ?? 0} doğru  •  🔍 {thread?.vote_investigate ?? 0} araştır
-          </Text>
+      <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 120 }}>
+        <View style={styles.metaRow}>
+          <PostTypeBadge type={thread.post_type} />
+          <View style={{ marginLeft: 'auto' }}><StatusChip status={thread.status} /></View>
         </View>
 
-        {thread?.body ? (
-          <Text style={[styles.body, { color: colors.text.secondary }]}>{thread.body}</Text>
+        <Text style={[styles.title, { color: colors.text.primary }]}>{thread.title}</Text>
+
+        <View style={styles.auth}>
+          <Avatar username={thread.author?.username} uri={thread.author?.avatar_url} size={26} />
+          <Text style={[styles.nm, { color: colors.text.secondary }]}>{thread.author?.username}</Text>
+          <Text style={[styles.dt, { color: colors.text.muted }]}>· {timeAgo(thread.created_at)}</Text>
+          {isNews && thread.article ? <View style={{ marginLeft: 'auto' }}><AIChip verdict={thread.article.ai_verdict} confidence={thread.article.confidence} /></View> : null}
+        </View>
+
+        {thread.body ? <Text style={[styles.body, { color: colors.text.secondary, borderLeftColor: 'rgba(16,185,129,0.4)' }]}>{thread.body}</Text> : null}
+
+        {thread.tags?.length ? (
+          <View style={styles.tags}>
+            {thread.tags.map(t => <Text key={t.id} style={[styles.tag, { color: colors.text.muted, backgroundColor: colors.bg.surface }]}>#{t.name}</Text>)}
+          </View>
         ) : null}
 
-        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        <LinkedArticleCard article={thread.article} />
 
-        <Text style={[styles.commentsTitle, { color: colors.text.primary }]}>
-          Yorumlar ({thread?.comment_count ?? 0})
-        </Text>
+        <Text style={[styles.section, { color: colors.text.primary }]}>Tartışma · {thread.comment_count} yorum</Text>
 
-        {(thread?.comments ?? []).map(comment => (
-          <View key={String(comment.id)} style={[styles.comment, { backgroundColor: colors.bg.surface, borderLeftColor: palette.brand.primary }]}>
-            <Text style={[styles.commentUser, { color: palette.brand.primary }]}>@{comment.username}</Text>
-            <Text style={[styles.commentBody, { color: colors.text.secondary }]}>{comment.body}</Text>
-          </View>
-        ))}
-
-        <Pressable
-          style={[styles.replyBtn, { borderColor: palette.brand.primary }]}
-          onPress={() => { if (!isAuth) setNudge(true); }}
-        >
-          <Text style={[styles.replyBtnText, { color: palette.brand.primary }]}>
-            {isAuth ? 'Yorum Yaz (yakında)' : 'Yorum yazmak için giriş yap'}
-          </Text>
-        </Pressable>
+        <View style={{ marginTop: 12 }}>
+          <CommentComposer
+            replyTo={replyTo}
+            onCancelReply={() => setReplyTo(null)}
+            onSubmit={submitComment}
+            submitting={addComment.isPending}
+          />
+          {thread.featured_evidence ? <FeaturedEvidence comment={thread.featured_evidence} /> : null}
+          <CommentTree
+            comments={thread.comments ?? []}
+            authorId={thread.author?.id}
+            onReply={(c) => setReplyTo({ id: c.id, username: c.username })}
+            onHelpful={onHelpful}
+            onReport={onReport}
+          />
+        </View>
       </ScrollView>
 
+      <VoteDock thread={thread} onVote={onVote} onComment={() => {}} />
       <LoginNudgeSheet visible={nudge} onClose={() => setNudge(false)} />
-    </>
+      <ForumActionSheet visible={menu} onClose={() => setMenu(false)} actions={menuActions} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  loader:        { flex:1, justifyContent:'center', alignItems:'center' },
-  content:       { paddingBottom: spacing.xxl },
-  back:          { paddingTop:50, paddingHorizontal: spacing.md, paddingBottom: spacing.sm },
-  catBadge:      { alignSelf:'flex-start', marginHorizontal: spacing.md, borderRadius: radius.full, paddingHorizontal: spacing.sm, paddingVertical:2, marginBottom: spacing.sm },
-  catText:       { fontSize: typography.xs, fontWeight:'600' },
-  title:         { fontSize: typography.lg, fontWeight:'700', paddingHorizontal: spacing.md, marginBottom: spacing.sm, lineHeight:26 },
-  votesRow:      { paddingHorizontal: spacing.md, marginBottom: spacing.md },
-  body:          { paddingHorizontal: spacing.md, fontSize: typography.md, lineHeight:22, marginBottom: spacing.lg },
-  divider:       { height:1, marginHorizontal: spacing.md, marginBottom: spacing.md },
-  commentsTitle: { paddingHorizontal: spacing.md, fontWeight:'600', fontSize: typography.md, marginBottom: spacing.sm },
-  comment:       { marginHorizontal: spacing.md, marginBottom: spacing.sm, padding: spacing.sm, borderLeftWidth:3, borderRadius: radius.sm },
-  commentUser:   { fontSize: typography.xs, fontWeight:'600', marginBottom:2 },
-  commentBody:   { fontSize: typography.sm, lineHeight:18 },
-  replyBtn:      { margin: spacing.md, borderRadius: radius.md, padding: spacing.md, alignItems:'center', borderWidth:1 },
-  replyBtnText:  { fontWeight:'600', fontSize: typography.sm },
+  loader:  { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  nav:     { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
+  bk:      { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  bkt:     { fontSize: 12, fontWeight: '700' },
+  sp:      { flexDirection: 'row', gap: 16, marginLeft: 'auto' },
+  metaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  title:   { fontSize: 19, fontWeight: '800', lineHeight: 25, marginBottom: 12 },
+  auth:    { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
+  nm:      { fontSize: 12, fontWeight: '700' },
+  dt:      { fontSize: 11, fontWeight: '600' },
+  body:    { fontSize: 13, lineHeight: 21, borderLeftWidth: 2, paddingLeft: 11, marginBottom: 14 },
+  tags:    { flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 14 },
+  tag:     { fontSize: 10, fontWeight: '600', paddingHorizontal: 7, paddingVertical: 4, borderRadius: 3 },
+  section: { fontSize: 13, fontWeight: '800', marginTop: 4 },
 });
