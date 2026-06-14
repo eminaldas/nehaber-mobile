@@ -1,8 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AppHeader from '../../../components/ui/AppHeader';
 import ShimmerCard from '../../../components/ui/ShimmerCard';
 import LoginNudgeSheet from '../../../components/ui/LoginNudgeSheet';
 import ForumCard from '../../../components/forum/ForumCard';
@@ -15,7 +14,6 @@ import { useThreads, useBookmarkToggle } from '../../../hooks/useForum';
 
 export default function ForumScreen() {
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const { isAuth } = useAuth();
   const toast = useToast();
   const [tab, setTab] = useState('hot');
@@ -30,13 +28,11 @@ export default function ForumScreen() {
 
   return (
     <View style={[styles.c, { backgroundColor: colors.bg.base }]}>
-      <View style={[styles.topbar, { paddingTop: insets.top + spacing.sm, backgroundColor: colors.bg.base, borderBottomColor: 'rgba(255,255,255,0.14)' }]}>
-        <Ionicons name="chatbubbles-outline" size={22} color={colors.text.muted} />
-        <Text style={[styles.logo, { color: colors.text.primary }]}>NeHaber</Text>
-        <Pressable onPress={requireAuth(() => router.push('/(tabs)/forum/yeni'))} hitSlop={8}>
-          <Ionicons name="add" size={26} color={palette.brand.bright} />
-        </Pressable>
-      </View>
+      <AppHeader
+        sectionIcon="chatbubbles-outline"
+        rightIcon="add"
+        onRight={requireAuth(() => router.push('/(tabs)/forum/yeni'))}
+      />
 
       <View style={[styles.chipBar, { backgroundColor: colors.bg.base, borderBottomColor: colors.border }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
