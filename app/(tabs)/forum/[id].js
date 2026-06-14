@@ -20,7 +20,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../hooks/useToast';
 import {
   useThread, useVote, useAddComment, useHelpful,
-  useReportComment, useReportThread, useDeleteThread,
+  useReportComment, useReportThread, useDeleteThread, useBookmarkToggle,
 } from '../../../hooks/useForum';
 import { timeAgo } from '../../../lib/forum/format';
 import ws from '../../../services/wsService';
@@ -39,6 +39,7 @@ export default function ForumDetailScreen() {
   const reportComment = useReportComment();
   const reportThreadM = useReportThread();
   const deleteThreadM = useDeleteThread();
+  const bookmark = useBookmarkToggle();
 
   const [nudge, setNudge] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
@@ -84,11 +85,18 @@ export default function ForumDetailScreen() {
     });
   };
 
+  const shareAction = { key: 'share', label: 'Paylaş', icon: 'external', onPress: () => shareThread(thread) };
+  const saveAction = { key: 'save', label: 'Kaydet', icon: 'bookmark', onPress: () => {
+    if (!isAuth) return setNudge(true);
+    bookmark.mutate(id, { onSuccess: () => toast.success('Kayıt güncellendi'), onError: () => toast.error('Kaydedilemedi') });
+  } };
   const menuActions = isOwner
-    ? [{ key: 'delete', label: 'Sil', icon: 'x', danger: true, onPress: () =>
+    ? [shareAction, saveAction, { key: 'delete', label: 'Sil', icon: 'x', danger: true, onPress: () =>
         deleteThreadM.mutate(id, { onSuccess: () => { toast.success('Silindi'); router.back(); }, onError: () => toast.error('Silinemedi') }) }]
-    : [{ key: 'report', label: 'Bildir', icon: 'flag', onPress: () =>
-        reportThreadM.mutate({ id, reason: 'spam' }, { onSuccess: () => toast.success('Bildirimin alındı'), onError: () => toast.error('Gönderilemedi') }) }];
+    : [shareAction, saveAction, { key: 'report', label: 'Bildir', icon: 'flag', onPress: () => {
+        if (!isAuth) return setNudge(true);
+        reportThreadM.mutate({ id, reason: 'spam' }, { onSuccess: () => toast.success('Bildirimin alındı'), onError: () => toast.error('Gönderilemedi') });
+      } }];
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg.base }}>
