@@ -12,6 +12,6 @@ export default function PostTypeBadge({ type }) {
   );
 }
 const styles = StyleSheet.create({
-  b: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: 4 },
+  b: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 2 },
   t: { fontSize: 10, fontFamily: fonts.bold, letterSpacing: 0.3 },
 });

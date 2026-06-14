@@ -17,7 +17,7 @@ export default function VoteControl({ thread, onVote, compact = false }) {
         onPress={() => onVote?.(vt)}
         style={[
           styles.chip,
-          { borderColor: colors.border, backgroundColor: colors.bg.solid },
+          { borderColor: colors.border, backgroundColor: 'transparent' },
           on && { borderColor: alpha(onColor, 0.55), backgroundColor: alpha(onColor, 0.1) },
           compact && styles.chipCompact,
         ]}
@@ -50,7 +50,7 @@ export default function VoteControl({ thread, onVote, compact = false }) {
 
 const styles = StyleSheet.create({
   row:   { flexDirection: 'row', gap: 7 },
-  chip:  { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, paddingVertical: 6, borderWidth: 1, borderRadius: 4 },
-  chipCompact: { paddingHorizontal: 8, paddingVertical: 5 },
+  chip:  { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderRadius: 2 },
+  chipCompact: { paddingHorizontal: 10, paddingVertical: 5 },
   count: { fontSize: 11, fontFamily: fonts.extrabold },
 });
