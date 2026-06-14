@@ -7,6 +7,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CornerBrackets from '../../../components/analysis/CornerBrackets';
 import BottomSheet from '../../../components/ui/BottomSheet';
+import AppHeader from '../../../components/ui/AppHeader';
 import { fonts, getAnalysisTheme, palette, radius, spacing } from '../../../constants/theme';
 import { useAuth } from '../../../hooks/useAuth';
 import { useTheme } from '../../../hooks/useTheme';
@@ -82,18 +83,13 @@ export default function ProfilScreen() {
   const sel = selected ? verdictOf(selected.prediction) : null;
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: colors.bg.base }}>
+      <AppHeader
+        sectionIcon="person-outline"
+        rightIcon="settings-outline"
+        onRight={() => router.push('/(tabs)/profil/ayarlar')}
+      />
       <ScrollView style={{ flex: 1, backgroundColor: colors.bg.base }} contentContainerStyle={{ paddingBottom: 120 }}>
-        {/* Üst bar */}
-        <View style={[styles.topbar, { paddingTop: insets.top + 10 }]}>
-          <View style={styles.titleRow}>
-            <Ionicons name="shield-checkmark" size={20} color={palette.brand.bright} />
-            <Text style={[styles.pageTitle, { color: colors.text.primary }]}>Profil</Text>
-          </View>
-          <Pressable hitSlop={10} onPress={() => router.push('/(tabs)/profil/ayarlar')}>
-            <Ionicons name="settings-outline" size={22} color={colors.text.secondary} />
-          </Pressable>
-        </View>
 
         {/* Odaklanma kutusu */}
         <View style={styles.focusWrap}>
@@ -248,7 +244,7 @@ export default function ProfilScreen() {
           </>
         )}
       </BottomSheet>
-    </>
+    </View>
   );
 }
 
