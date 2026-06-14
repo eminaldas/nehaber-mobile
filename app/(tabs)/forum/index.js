@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -31,10 +31,10 @@ export default function ForumScreen() {
   return (
     <View style={[styles.c, { backgroundColor: colors.bg.base }]}>
       <View style={[styles.topbar, { paddingTop: insets.top + spacing.sm, backgroundColor: colors.bg.base, borderBottomColor: 'rgba(255,255,255,0.14)' }]}>
-        <MaterialCommunityIcons name="forum-outline" size={22} color={colors.text.muted} />
+        <Ionicons name="chatbubbles-outline" size={22} color={colors.text.muted} />
         <Text style={[styles.logo, { color: colors.text.primary }]}>NeHaber</Text>
         <Pressable onPress={requireAuth(() => router.push('/(tabs)/forum/yeni'))} hitSlop={8}>
-          <MaterialCommunityIcons name="plus" size={24} color={palette.brand.bright} />
+          <Ionicons name="add" size={26} color={palette.brand.bright} />
         </Pressable>
       </View>
 

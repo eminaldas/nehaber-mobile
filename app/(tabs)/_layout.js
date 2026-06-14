@@ -10,7 +10,7 @@ import { useTheme } from '../../hooks/useTheme';
 const ICONS = {
   haberler: { on: 'newspaper',           off: 'newspaper-outline' },
   analiz:   { on: 'search',              off: 'search-outline' },
-  forum:    { on: 'chatbubble-ellipses', off: 'chatbubble-ellipses-outline' },
+  forum:    { on: 'chatbubbles', off: 'chatbubbles-outline' },
   profil:   { on: 'person',              off: 'person-outline' },
 };
 

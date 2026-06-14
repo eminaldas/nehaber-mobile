@@ -14,7 +14,7 @@ import CommentTree from '../../../components/forum/CommentTree';
 import FeaturedEvidence from '../../../components/forum/FeaturedEvidence';
 import ForumActionSheet, { shareThread } from '../../../components/forum/ForumActionSheet';
 import LoginNudgeSheet from '../../../components/ui/LoginNudgeSheet';
-import { palette, fonts } from '../../../constants/theme';
+import { palette, fonts, spacing } from '../../../constants/theme';
 import { useTheme } from '../../../hooks/useTheme';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../hooks/useToast';
@@ -92,14 +92,14 @@ export default function ForumDetailScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg.base }}>
-      <View style={[styles.nav, { paddingTop: insets.top + 4, borderBottomColor: colors.border }]}>
+      <View style={[styles.nav, { paddingTop: insets.top + spacing.sm, borderBottomColor: 'rgba(255,255,255,0.14)' }]}>
         <Pressable style={styles.bk} onPress={() => router.back()} hitSlop={8}>
-          <Icon name="arrow-left" size={16} color={colors.text.secondary} strokeWidth={2.2} />
-          <Text style={[styles.bkt, { color: colors.text.secondary }]}>Forum</Text>
+          <Icon name="arrow-left" size={22} color={colors.text.primary} strokeWidth={2.2} />
+          <Text style={[styles.bkt, { color: colors.text.primary }]}>Forum</Text>
         </Pressable>
         <View style={styles.sp}>
-          <Pressable onPress={() => shareThread(thread)} hitSlop={8}><Icon name="share" size={17} color={colors.text.muted} /></Pressable>
-          <Pressable onPress={() => setMenu(true)} hitSlop={8}><Icon name="dots" size={17} color={colors.text.muted} /></Pressable>
+          <Pressable onPress={() => shareThread(thread)} hitSlop={8}><Icon name="share" size={21} color={colors.text.muted} /></Pressable>
+          <Pressable onPress={() => setMenu(true)} hitSlop={8}><Icon name="dots" size={21} color={colors.text.muted} /></Pressable>
         </View>
       </View>
 
@@ -157,9 +157,9 @@ export default function ForumDetailScreen() {
 
 const styles = StyleSheet.create({
   loader:  { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  nav:     { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
+  nav:     { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingBottom: spacing.sm, borderBottomWidth: 1 },
   bk:      { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  bkt:     { fontSize: 12, fontFamily: fonts.bold },
+  bkt:     { fontSize: 15, fontFamily: fonts.bold },
   sp:      { flexDirection: 'row', gap: 16, marginLeft: 'auto' },
   metaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   title:   { fontSize: 19, fontFamily: fonts.extrabold, lineHeight: 25, marginBottom: 12 },
