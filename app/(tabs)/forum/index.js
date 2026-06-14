@@ -1,96 +1,87 @@
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Icon from '../../../components/ui/Icon';
 import ShimmerCard from '../../../components/ui/ShimmerCard';
-import { palette, radius, spacing, typography } from '../../../constants/theme';
+import LoginNudgeSheet from '../../../components/ui/LoginNudgeSheet';
+import ForumCard from '../../../components/forum/ForumCard';
+import { FORUM_TABS } from '../../../constants/forum';
+import { palette } from '../../../constants/theme';
 import { useTheme } from '../../../hooks/useTheme';
-import { getThreads } from '../../../services/forumService';
-
-function ForumCard({ item, onPress }) {
-  const { colors } = useTheme();
-  const total = (item.vote_suspicious ?? 0) + (item.vote_authentic ?? 0) + (item.vote_investigate ?? 0);
-
-  return (
-    <Pressable
-      style={[styles.card, { backgroundColor: colors.bg.surface, borderColor: colors.border }]}
-      onPress={onPress}
-    >
-      {item.category && (
-        <View style={[styles.catBadge, { backgroundColor: palette.brand.accent }]}>
-          <Text style={[styles.catText, { color: palette.brand.primary }]}>{item.category}</Text>
-        </View>
-      )}
-      <Text style={[styles.title, { color: colors.text.primary }]} numberOfLines={2}>{item.title}</Text>
-      <View style={styles.meta}>
-        <Text style={[styles.metaText, { color: colors.text.muted }]}>
-          @{item.author?.username ?? '?'}
-        </Text>
-        <Text style={[styles.metaText, { color: colors.text.muted }]}>
-          💬 {item.comment_count ?? 0}  •  🗳 {total}
-        </Text>
-      </View>
-    </Pressable>
-  );
-}
+import { useAuth } from '../../../hooks/useAuth';
+import { useToast } from '../../../hooks/useToast';
+import { useThreads, useVote, useBookmarkToggle } from '../../../hooks/useForum';
 
 export default function ForumScreen() {
   const { colors } = useTheme();
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
-    useInfiniteQuery({
-      queryKey:         ['forum-threads'],
-      queryFn:          ({ pageParam = 1 }) => getThreads({ page: pageParam }),
-      getNextPageParam: (last) => {
-        const loaded = last.page * last.size;
-        return loaded < last.total ? last.page + 1 : undefined;
-      },
-      initialPageParam: 1,
-    });
+  const insets = useSafeAreaInsets();
+  const { isAuth } = useAuth();
+  const toast = useToast();
+  const [tab, setTab] = useState('hot');
+  const [nudge, setNudge] = useState(false);
 
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching } = useThreads(tab);
+  const bookmark = useBookmarkToggle();
   const items = data?.pages.flatMap(p => p.items) ?? [];
 
-  if (isLoading) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.bg.base }]}>
-        {[1,2,3].map(i => <ShimmerCard key={i} />)}
-      </View>
-    );
-  }
+  const requireAuth = (fn) => (...a) => { if (!isAuth) return setNudge(true); fn(...a); };
+
+  const onBookmark = requireAuth((id) => bookmark.mutate(id, { onError: () => toast.error('Kaydedilemedi') }));
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.bg.base }]}>
-      <View style={[styles.header, { backgroundColor: colors.bg.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.headerTitle, { color: colors.text.primary }]}>Forum</Text>
+    <View style={[styles.c, { backgroundColor: colors.bg.base }]}>
+      <View style={[styles.hdr, { paddingTop: insets.top + 6, backgroundColor: colors.bg.deepest, borderBottomColor: colors.border }]}>
+        <Text style={[styles.logo, { color: colors.text.primary }]}>ne<Text style={{ color: palette.brand.primary }}>haber</Text></Text>
+        <Pressable onPress={requireAuth(() => router.push('/(tabs)/forum/yeni'))}
+          style={[styles.add, { borderColor: colors.border }]} hitSlop={6}>
+          <Icon name="plus" size={16} color={palette.brand.bright} strokeWidth={2.4} />
+        </Pressable>
       </View>
-      <FlatList
-        data={items}
-        keyExtractor={item => String(item.id)}
-        renderItem={({ item }) => (
-          <ForumCard item={item} onPress={() => router.push(`/(tabs)/forum/${item.id}`)} />
-        )}
-        onEndReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}
-        onEndReachedThreshold={0.5}
-        onRefresh={refetch}
-        refreshing={false}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={{ color: colors.text.muted }}>Henüz thread yok.</Text>
-          </View>
-        }
-      />
+
+      <View style={styles.tabs}>
+        {FORUM_TABS.map(t => (
+          <Pressable key={t.key} onPress={() => setTab(t.key)}>
+            <Text style={[styles.tab, { color: tab === t.key ? colors.text.primary : colors.text.muted }]}>{t.label}</Text>
+            {tab === t.key && <View style={[styles.ind, { backgroundColor: palette.brand.bright }]} />}
+          </Pressable>
+        ))}
+      </View>
+
+      {isLoading ? (
+        <View style={{ padding: 16 }}>{[1, 2, 3].map(i => <ShimmerCard key={i} />)}</View>
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={i => String(i.id)}
+          renderItem={({ item }) => (
+            <ForumCard
+              thread={item}
+              onPress={() => router.push(`/(tabs)/forum/${item.id}`)}
+              onVote={() => router.push(`/(tabs)/forum/${item.id}`)}
+              onBookmark={() => onBookmark(item.id)}
+            />
+          )}
+          onEndReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}
+          onEndReachedThreshold={0.5}
+          onRefresh={refetch}
+          refreshing={isRefetching}
+          ListEmptyComponent={<View style={styles.empty}><Text style={{ color: colors.text.muted }}>{tab === 'bookmarks' ? 'Henüz bir şey kaydetmedin.' : 'Henüz tartışma yok.'}</Text></View>}
+        />
+      )}
+
+      <LoginNudgeSheet visible={nudge} onClose={() => setNudge(false)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container:   { flex:1 },
-  header:      { paddingTop:50, paddingBottom: spacing.md, paddingHorizontal: spacing.md, borderBottomWidth:1 },
-  headerTitle: { fontSize: typography.xl, fontWeight:'700' },
-  card:        { margin: spacing.md, marginBottom:0, padding: spacing.md, borderRadius: radius.lg, borderWidth:1 },
-  catBadge:    { alignSelf:'flex-start', borderRadius: radius.full, paddingHorizontal: spacing.sm, paddingVertical:2, marginBottom: spacing.xs },
-  catText:     { fontSize: typography.xs, fontWeight:'600' },
-  title:       { fontSize: typography.md, fontWeight:'600', lineHeight:22, marginBottom: spacing.sm },
-  meta:        { flexDirection:'row', justifyContent:'space-between' },
-  metaText:    { fontSize: typography.xs },
-  empty:       { flex:1, alignItems:'center', paddingTop:80 },
+  c:    { flex: 1 },
+  hdr:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 1 },
+  logo: { fontSize: 18, fontWeight: '800' },
+  add:  { width: 30, height: 30, borderRadius: 9, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  tabs: { flexDirection: 'row', gap: 18, paddingHorizontal: 16, paddingVertical: 10 },
+  tab:  { fontSize: 12, fontWeight: '700' },
+  ind:  { height: 2, borderRadius: 2, marginTop: 6 },
+  empty:{ alignItems: 'center', paddingTop: 80 },
 });
