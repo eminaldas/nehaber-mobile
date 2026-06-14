@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AuroraGlow from './AuroraGlow';
@@ -7,37 +7,56 @@ import { fonts, spacing } from '../../constants/theme';
 import { useTheme } from '../../hooks/useTheme';
 
 /**
- * Tüm sekmelerde paylaşılan üst bar: NeHaber markası + aurora gradyen.
- * Yan buton (sectionIcon solda, rightIcon sağda) bölüme göre değişir; bar dili sabit.
- * `sub` verilince morph animasyonu: aurora solar, NeHaber yukarı kaybolur,
- * alttan `sub.title` gelir, kart kısalır, sol ikon geri-oka döner.
+ * Tüm sekmelerde paylaşılan üst bar: NeHaber + aurora gradyen. Yan buton bölüme göre değişir.
+ * - `sub` verilince: morph (aurora solar, NeHaber yukarı gider, alttan sub.title gelir, kart kısalır).
+ * - `onSearch` verilince: sol ikon aramayı açar; input animasyonla genişler, her tuşta onSearch(q) çağrılır.
  */
-export default function AppHeader({ sectionIcon = 'newspaper-outline', rightIcon, onRight, sub = null, onBack }) {
+export default function AppHeader({
+  sectionIcon = 'newspaper-outline', rightIcon, onRight,
+  sub = null, onBack,
+  onSearch, searchPlaceholder = 'Ara…',
+}) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const m = useRef(new Animated.Value(sub ? 1 : 0)).current;
+  const searchable = !!onSearch;
+  const inputRef = useRef(null);
+  const [searching, setSearching] = useState(false);
+  const [q, setQ] = useState('');
 
+  const active = !!sub || searching;
+  const aV   = useRef(new Animated.Value(0)).current;  // aurora + brand fade
+  const subV = useRef(new Animated.Value(0)).current;  // height + subtitle
+  const seaV = useRef(new Animated.Value(0)).current;  // search input
+
+  const anim = (v, to) => Animated.timing(v, { toValue: to, duration: 480, easing: Easing.inOut(Easing.cubic), useNativeDriver: false }).start();
+  useEffect(() => { anim(aV, active ? 1 : 0); }, [active]);          // eslint-disable-line
+  useEffect(() => { anim(subV, sub ? 1 : 0); }, [sub]);             // eslint-disable-line
   useEffect(() => {
-    Animated.timing(m, {
-      toValue: sub ? 1 : 0,
-      duration: 520,
-      easing: Easing.inOut(Easing.cubic),
-      useNativeDriver: false,
-    }).start();
-  }, [sub, m]);
+    anim(seaV, searching ? 1 : 0);
+    if (searching) setTimeout(() => inputRef.current?.focus(), 220);
+  }, [searching]);                                                  // eslint-disable-line
 
   const HOME_H = insets.top + 104;
   const SUB_H  = insets.top + 48;
 
-  const height   = m.interpolate({ inputRange: [0, 1], outputRange: [HOME_H, SUB_H] });
-  const auroraOp = m.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
-  const brandT   = m.interpolate({ inputRange: [0, 1], outputRange: [0, -34] });
-  const brandO   = m.interpolate({ inputRange: [0, 0.6], outputRange: [1, 0], extrapolate: 'clamp' });
-  const subT     = m.interpolate({ inputRange: [0, 1], outputRange: [28, 0] });
-  const subO     = m.interpolate({ inputRange: [0.45, 1], outputRange: [0, 1], extrapolate: 'clamp' });
-  const searchO  = m.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
-  const backO    = m.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
-  const rightO   = m.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+  const height   = subV.interpolate({ inputRange: [0, 1], outputRange: [HOME_H, SUB_H] });
+  const auroraOp = aV.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+  const brandO   = aV.interpolate({ inputRange: [0, 0.6], outputRange: [1, 0], extrapolate: 'clamp' });
+  const brandT   = aV.interpolate({ inputRange: [0, 1], outputRange: [0, -30] });
+  const subO     = subV.interpolate({ inputRange: [0.45, 1], outputRange: [0, 1], extrapolate: 'clamp' });
+  const subT     = subV.interpolate({ inputRange: [0, 1], outputRange: [26, 0] });
+  const seaO     = seaV.interpolate({ inputRange: [0.2, 1], outputRange: [0, 1], extrapolate: 'clamp' });
+  const seaScale = seaV.interpolate({ inputRange: [0, 1], outputRange: [0.35, 1] });
+  const sectionO = aV.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+  const altO     = aV.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
+  const rightO   = aV.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+
+  const onLeft = () => {
+    if (searching) { setSearching(false); setQ(''); onSearch?.(''); }
+    else if (sub) { onBack?.(); }
+    else if (searchable) { setSearching(true); }
+  };
+  const onType = (t) => { setQ(t); onSearch?.(t); };
 
   return (
     <Animated.View style={[styles.hdr, { height, backgroundColor: colors.bg.base, borderBottomColor: 'rgba(255,255,255,0.14)' }]}>
@@ -46,18 +65,18 @@ export default function AppHeader({ sectionIcon = 'newspaper-outline', rightIcon
       </Animated.View>
 
       <View style={[styles.toprow, { top: insets.top + 8 }]}>
-        <Pressable hitSlop={12} onPress={() => sub && onBack?.()} style={styles.side}>
-          <Animated.View style={[styles.abs, { opacity: searchO }]}>
+        <Pressable hitSlop={12} onPress={onLeft} style={styles.side}>
+          <Animated.View style={[styles.abs, { opacity: sectionO }]}>
             <Ionicons name={sectionIcon} size={22} color={colors.text.muted} />
           </Animated.View>
-          <Animated.View style={[styles.abs, { opacity: backO }]}>
-            <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
+          <Animated.View style={[styles.abs, { opacity: altO }]}>
+            <Ionicons name={searching ? 'close' : 'chevron-back'} size={24} color={colors.text.primary} />
           </Animated.View>
         </Pressable>
 
         {rightIcon ? (
           <Animated.View style={{ opacity: rightO }}>
-            <Pressable hitSlop={12} onPress={onRight} disabled={!!sub}>
+            <Pressable hitSlop={12} onPress={onRight} disabled={active}>
               <Ionicons name={rightIcon} size={23} color={colors.text.secondary} />
             </Pressable>
           </Animated.View>
@@ -68,6 +87,27 @@ export default function AppHeader({ sectionIcon = 'newspaper-outline', rightIcon
         <Animated.Text style={[styles.brand, { color: colors.text.primary, opacity: brandO, transform: [{ translateY: brandT }] }]}>NeHaber</Animated.Text>
         <Animated.Text numberOfLines={1} style={[styles.sub, { color: colors.text.primary, opacity: subO, transform: [{ translateY: subT }] }]}>{sub?.title ?? ''}</Animated.Text>
       </View>
+
+      {searchable ? (
+        <Animated.View pointerEvents={searching ? 'auto' : 'none'}
+          style={[styles.sfield, { opacity: seaO, transform: [{ scaleX: seaScale }], borderColor: colors.border, backgroundColor: colors.bg.solid }]}>
+          <Ionicons name="search" size={17} color={colors.text.muted} />
+          <TextInput
+            ref={inputRef}
+            style={[styles.input, { color: colors.text.primary }]}
+            placeholder={searchPlaceholder}
+            placeholderTextColor={colors.text.muted}
+            value={q}
+            onChangeText={onType}
+            returnKeyType="search"
+          />
+          {q ? (
+            <Pressable hitSlop={8} onPress={() => onType('')}>
+              <Ionicons name="close-circle" size={18} color={colors.text.muted} />
+            </Pressable>
+          ) : null}
+        </Animated.View>
+      ) : null}
     </Animated.View>
   );
 }
@@ -80,4 +120,6 @@ const styles = StyleSheet.create({
   titles: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 48, zIndex: 2 },
   brand:  { position: 'absolute', left: 0, right: 0, bottom: 12, textAlign: 'center', fontFamily: fonts.logo, fontSize: 26, letterSpacing: 0.5 },
   sub:    { position: 'absolute', left: 0, right: 0, bottom: 13, textAlign: 'center', fontFamily: fonts.extrabold, fontSize: 19 },
+  sfield: { position: 'absolute', left: spacing.md, right: spacing.md, bottom: 11, height: 42, flexDirection: 'row', alignItems: 'center', gap: 9, borderWidth: 1, borderRadius: 4, paddingHorizontal: 12, zIndex: 2 },
+  input:  { flex: 1, fontFamily: fonts.medium, fontSize: 14, padding: 0 },
 });

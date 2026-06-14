@@ -8,7 +8,7 @@ import VoteControl from './VoteControl';
 import VoteDistributionBar from './VoteDistributionBar';
 import { shareThread } from './ForumActionSheet';
 import { useTheme } from '../../hooks/useTheme';
-import { timeAgo, voteDistribution } from '../../lib/forum/format';
+import { timeAgo, voteDistribution, dateLabel } from '../../lib/forum/format';
 import { VOTE_COLORS } from '../../constants/forum';
 import { fonts } from '../../constants/theme';
 
@@ -38,6 +38,8 @@ export default function ForumCard({ thread, onPress, onVote, onBookmark }) {
         <PostTypeBadge type={thread.post_type} />
         <Text style={[styles.time, { color: colors.text.muted }]}>· {timeAgo(thread.created_at)}</Text>
       </View>
+
+      <Text style={[styles.date, { color: colors.text.muted }]}>{dateLabel(thread.created_at)}</Text>
 
       <Text style={[styles.title, { color: colors.text.primary }]} numberOfLines={3}>{thread.title}</Text>
 
@@ -90,6 +92,7 @@ const styles = StyleSheet.create({
   head:   { flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: 10 },
   name:   { fontSize: 14, fontFamily: fonts.extrabold, flexShrink: 1 },
   time:   { fontSize: 12, fontFamily: fonts.semibold },
+  date:   { fontSize: 11, fontFamily: fonts.semibold, marginBottom: 7 },
   title:  { fontSize: 16, fontFamily: fonts.extrabold, lineHeight: 22, marginBottom: 7 },
   body:   { fontSize: 13, fontFamily: fonts.regular, lineHeight: 19, marginBottom: 11 },
   tags:   { flexDirection: 'row', gap: 10, marginBottom: 12 },
