@@ -7,6 +7,11 @@ export async function getNewsFeed({ page = 1, category = null, pageSize = 20 } =
   return data; // { items: NewsArticleResponse[], total, page }
 }
 
+export async function searchNews(q, { size = 50 } = {}) {
+  const { data } = await api.get('/news', { params: { q, size } });
+  return data; // { items, total, page }
+}
+
 export async function getNewsDetail(id) {
   const { data } = await api.get(`/news/${id}`);
   return data;
