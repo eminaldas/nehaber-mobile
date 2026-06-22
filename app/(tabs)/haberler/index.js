@@ -8,10 +8,12 @@ import HeroCard from '../../../components/cards/HeroCard';
 import TrendRail from '../../../components/cards/TrendRail';
 import DailySummaryCard from '../../../components/digest/DailySummaryCard';
 import DailySummarySheet from '../../../components/digest/DailySummarySheet';
-import AppHeader from '../../../components/ui/AppHeader';
 import CategoryBar from '../../../components/news/CategoryBar';
+import AppHeader from '../../../components/ui/AppHeader';
+import LoginNudgeSheet from '../../../components/ui/LoginNudgeSheet';
 import ShimmerCard from '../../../components/ui/ShimmerCard';
 import { fonts, palette, spacing } from '../../../constants/theme';
+import { useAuth } from '../../../hooks/useAuth';
 import { useNewsFeed } from '../../../hooks/useNewsFeed';
 import { usePopularNews } from '../../../hooks/usePopularNews';
 import { useTheme } from '../../../hooks/useTheme';
@@ -24,6 +26,10 @@ export default function HaberlerScreen() {
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, refetch } = useNewsFeed(category);
   const { data: trending } = usePopularNews();
   const [digestOpen, setDigestOpen] = useState(false);
+
+  const { isAuth } = useAuth();
+  const [nudge, setNudge] = useState(false);
+  const onCustomize = () => (isAuth ? router.push('/(tabs)/haberler/kategoriler') : setNudge(true));
 
   const items = data?.pages.flatMap(p => p.items) ?? [];
   const hero  = items[0];
@@ -50,7 +56,7 @@ export default function HaberlerScreen() {
           keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => <HaberCard item={item} onPress={() => open(item.id)} />}
           contentContainerStyle={{ paddingBottom: 96 }}
-          ListHeaderComponent={<Text style={[styles.resCap, { color: colors.text.muted }]}>“{query}” · {searchData?.total ?? 0} sonuç</Text>}
+          ListHeaderComponent={<Text style={[styles.resCap, { color: colors.text.muted }]}>"{query}" · {searchData?.total ?? 0} sonuç</Text>}
           ListEmptyComponent={
             <View style={styles.empty}>
               {searchLoading ? <ActivityIndicator color={palette.brand.primary} /> : <Text style={[styles.emptyText, { color: colors.text.muted }]}>Sonuç bulunamadı.</Text>}
@@ -59,7 +65,7 @@ export default function HaberlerScreen() {
         />
       ) : isLoading ? (
         <>
-          <CategoryBar selected={category} onSelect={setCategory} />
+          <CategoryBar selected={category} onSelect={setCategory} onCustomize={onCustomize} />
           <View style={{ paddingTop: spacing.sm }}>{[1, 2, 3, 4, 5].map(i => <ShimmerCard key={i} />)}</View>
         </>
       ) : (
@@ -69,7 +75,7 @@ export default function HaberlerScreen() {
           renderItem={({ item }) => <HaberCard item={item} onPress={() => open(item.id)} />}
           ListHeaderComponent={
             <>
-              <CategoryBar selected={category} onSelect={setCategory} />
+              <CategoryBar selected={category} onSelect={setCategory} onCustomize={onCustomize} />
               {hero ? <HeroCard item={hero} onPress={() => open(hero.id)} /> : null}
               {category === null ? <TrendRail items={trending} onOpen={open} /> : null}
               <DailySummaryCard onPress={() => setDigestOpen(true)} />
@@ -93,6 +99,7 @@ export default function HaberlerScreen() {
       )}
 
       <DailySummarySheet open={digestOpen} onClose={() => setDigestOpen(false)} />
+      <LoginNudgeSheet visible={nudge} onClose={() => setNudge(false)} />
     </View>
   );
 }

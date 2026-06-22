@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { fonts, palette, spacing } from '../../constants/theme';
@@ -14,7 +15,7 @@ const FALLBACK = [
   { slug: 'yaşam', name: 'Yaşam' },
 ];
 
-export default function CategoryBar({ selected, onSelect }) {
+export default function CategoryBar({ selected, onSelect, onCustomize }) {
   const { colors } = useTheme();
   const { isAuth } = useAuth();
   const { data: categories, isError } = useCategories();
@@ -37,6 +38,9 @@ export default function CategoryBar({ selected, onSelect }) {
             </Pressable>
           );
         })}
+        <Pressable onPress={onCustomize} style={styles.gear} hitSlop={8}>
+          <Ionicons name="options-outline" size={18} color={colors.text.muted} />
+        </Pressable>
       </ScrollView>
     </View>
   );
@@ -48,4 +52,5 @@ const styles = StyleSheet.create({
   tab:       { paddingVertical: spacing.sm, alignItems: 'center', gap: 6 },
   tabText:   { fontFamily: fonts.bold, fontSize: 14, letterSpacing: 0.2 },
   underline: { height: 2, width: '100%', borderRadius: 2 },
+  gear:      { paddingVertical: spacing.sm, paddingLeft: spacing.sm, alignSelf: 'center' },
 });
