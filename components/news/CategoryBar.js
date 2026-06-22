@@ -28,7 +28,7 @@ export default function CategoryBar({ selected, onSelect, onCustomize }) {
 
   return (
     <View style={[styles.bar, { backgroundColor: colors.bg.base, borderBottomColor: colors.border }]}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row} style={styles.scroll}>
         {chips.map(cat => {
           const active = selected === cat.slug;
           return (
@@ -38,19 +38,25 @@ export default function CategoryBar({ selected, onSelect, onCustomize }) {
             </Pressable>
           );
         })}
-        <Pressable onPress={onCustomize} style={styles.gear} hitSlop={8}>
-          <Ionicons name="options-outline" size={18} color={colors.text.muted} />
-        </Pressable>
       </ScrollView>
+      {/* Özelleştir: şeritten ayrı, sağda sabit kalır (kategori sayısı artsa da kaybolmaz) */}
+      <Pressable
+        onPress={onCustomize}
+        style={[styles.gear, { borderLeftColor: colors.border, backgroundColor: colors.bg.base }]}
+        hitSlop={8}
+      >
+        <Ionicons name="options-outline" size={18} color={colors.text.muted} />
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bar:       { borderBottomWidth: 1 },
+  bar:       { borderBottomWidth: 1, flexDirection: 'row', alignItems: 'stretch' },
+  scroll:    { flex: 1 },
   row:       { paddingHorizontal: spacing.md, gap: spacing.lg, alignItems: 'flex-end' },
   tab:       { paddingVertical: spacing.sm, alignItems: 'center', gap: 6 },
   tabText:   { fontFamily: fonts.bold, fontSize: 14, letterSpacing: 0.2 },
   underline: { height: 2, width: '100%', borderRadius: 2 },
-  gear:      { paddingVertical: spacing.sm, paddingLeft: spacing.sm, alignSelf: 'center' },
+  gear:      { justifyContent: 'center', alignItems: 'center', paddingHorizontal: spacing.md, borderLeftWidth: 1 },
 });
