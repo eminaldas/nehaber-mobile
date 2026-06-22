@@ -10,6 +10,7 @@ export function useFeedPreferences() {
     queryFn:   getFeedPreferences,
     enabled:   isAuth,
     staleTime: 5 * 60 * 1000,
+    retry:     false, // başarısızsa hızlı düş — bar zaten "tümü görünür"e zarif iniyor
   });
 }
 
