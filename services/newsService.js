@@ -38,3 +38,9 @@ export async function summarizeNews(id) {
   const { data } = await api.post(`/news/${id}/summarize`);
   return data; // { summary: string }
 }
+
+// Public kategori ağacı → düz ana kategori listesi (alt kategoriler atılır)
+export async function getCategories() {
+  const { data } = await api.get('/news/categories');
+  return Array.isArray(data) ? data.map(c => ({ slug: c.slug, name: c.name })) : [];
+}
