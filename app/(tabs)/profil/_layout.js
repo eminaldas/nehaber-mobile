@@ -2,5 +2,9 @@ import { Stack } from 'expo-router';
 import React from 'react';
 
 export default function Layout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false, animation: 'fade_from_bottom', animationDuration: 260 }}>
+      <Stack.Screen name="index" options={{ animation: 'none' }} />
+    </Stack>
+  );
 }
