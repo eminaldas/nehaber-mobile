@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 import { diffSelection } from '../lib/categories/selection';
-import { addHiddenCategory, getFeedPreferences, removeHiddenCategory } from '../services/userService';
+import {
+  addHiddenCategory, addHiddenSubcategory, getFeedPreferences,
+  removeHiddenCategory, removeHiddenSubcategory,
+} from '../services/userService';
 
 export function useFeedPreferences() {
   const { isAuth } = useAuth();
@@ -19,11 +22,18 @@ export function useSaveCategorySelection() {
   return useMutation({
     // PATCH'ler SIRAYLA atılır: backend her çağrıda JSONB listesini oku-değiştir-yaz
     // yaptığı için paralel istekler birbirini ezer.
-    mutationFn: async ({ allSlugs, selected, currentHidden }) => {
-      const { toAdd, toRemove } = diffSelection(allSlugs, selected, currentHidden);
-      for (const slug of toAdd)    await addHiddenCategory(slug);
-      for (const slug of toRemove) await removeHiddenCategory(slug);
-      return { toAdd, toRemove };
+    // Ana kategoriler: slug; alt kategoriler: "ana/alt" çiftleri.
+    mutationFn: async ({
+      allMainSlugs, selectedMains, currentHiddenCats,
+      allSubPairs = [], selectedSubs = [], currentHiddenSubs = [],
+    }) => {
+      const cats = diffSelection(allMainSlugs, selectedMains, currentHiddenCats);
+      const subs = diffSelection(allSubPairs, selectedSubs, currentHiddenSubs);
+      for (const slug of cats.toAdd)    await addHiddenCategory(slug);
+      for (const slug of cats.toRemove) await removeHiddenCategory(slug);
+      for (const pair of subs.toAdd)    await addHiddenSubcategory(pair);
+      for (const pair of subs.toRemove) await removeHiddenSubcategory(pair);
+      return { cats, subs };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['feed-preferences'] });

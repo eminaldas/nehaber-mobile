@@ -22,8 +22,12 @@ import { searchNews } from '../../../services/newsService';
 export default function HaberlerScreen() {
   const { colors } = useTheme();
   const [category, setCategory] = useState(null);
+  const [subcategory, setSubcategory] = useState(null);
   const [q, setQ] = useState('');
-  const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, refetch } = useNewsFeed(category);
+  const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage, refetch } = useNewsFeed(category, subcategory);
+
+  // Ana kategori değişince alt kategori filtresini sıfırla
+  const selectCategory = (slug) => { setCategory(slug); setSubcategory(null); };
   const { data: trending } = usePopularNews();
   const [digestOpen, setDigestOpen] = useState(false);
 
@@ -65,7 +69,7 @@ export default function HaberlerScreen() {
         />
       ) : isLoading ? (
         <>
-          <CategoryBar selected={category} onSelect={setCategory} onCustomize={onCustomize} />
+          <CategoryBar selected={category} onSelect={selectCategory} subcategory={subcategory} onSelectSub={setSubcategory} onCustomize={onCustomize} />
           <View style={{ paddingTop: spacing.sm }}>{[1, 2, 3, 4, 5].map(i => <ShimmerCard key={i} />)}</View>
         </>
       ) : (
@@ -75,7 +79,7 @@ export default function HaberlerScreen() {
           renderItem={({ item }) => <HaberCard item={item} onPress={() => open(item.id)} />}
           ListHeaderComponent={
             <>
-              <CategoryBar selected={category} onSelect={setCategory} onCustomize={onCustomize} />
+              <CategoryBar selected={category} onSelect={selectCategory} subcategory={subcategory} onSelectSub={setSubcategory} onCustomize={onCustomize} />
               {hero ? <HeroCard item={hero} onPress={() => open(hero.id)} /> : null}
               {category === null ? <TrendRail items={trending} onOpen={open} /> : null}
               <DailySummaryCard onPress={() => setDigestOpen(true)} />
