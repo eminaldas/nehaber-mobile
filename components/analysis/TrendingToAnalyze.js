@@ -18,7 +18,7 @@ export default function TrendingToAnalyze({ items, onPick }) {
       <View style={[styles.list, { borderColor: colors.border, backgroundColor: colors.bg.surface }]}>
         {items.map((item, i) => (
           <Pressable
-            key={String(item.id)}
+            key={`${item.id}-${i}`}
             onPress={() => onPick(item)}
             style={({ pressed }) => [
               styles.row,
