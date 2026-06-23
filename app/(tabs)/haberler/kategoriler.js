@@ -9,6 +9,9 @@ import { useFeedPreferences, useSaveCategorySelection } from '../../../hooks/use
 import { useTheme } from '../../../hooks/useTheme';
 import { useToast } from '../../../hooks/useToast';
 
+// Cam tab bar yüksekliği (60) + boşluk — footer butonu barın arkasında kalmasın
+const TAB_BAR_CLEARANCE = 72;
+
 export default function KategorilerScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -92,7 +95,7 @@ export default function KategorilerScreen() {
       {isLoading ? (
         <View style={styles.center}><ActivityIndicator color={palette.brand.primary} /></View>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.list}>
           {all.map(cat => {
             const on = sel.mains.has(cat.slug);
             const subs = cat.subcategories ?? [];
@@ -141,7 +144,7 @@ export default function KategorilerScreen() {
         </ScrollView>
       )}
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md, backgroundColor: colors.bg.base, borderTopColor: colors.border }]}>
+      <View style={[styles.footer, { paddingBottom: insets.bottom + TAB_BAR_CLEARANCE, backgroundColor: colors.bg.base, borderTopColor: colors.border }]}>
         <Pressable
           onPress={onDone}
           disabled={save.isPending}
@@ -160,6 +163,7 @@ const styles = StyleSheet.create({
   title:     { fontFamily: fonts.extrabold, fontSize: 20 },
   sub:       { fontFamily: fonts.medium, fontSize: 13, marginTop: 2 },
   center:    { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  scroll:    { flex: 1 },
   list:      { padding: spacing.md, gap: spacing.sm },
   block:     { borderWidth: 1, borderRadius: radius.md },
   row:       { flexDirection: 'row', alignItems: 'center' },
