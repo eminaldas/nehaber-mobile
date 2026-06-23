@@ -9,7 +9,6 @@ import AppHeader from '../../../components/ui/AppHeader';
 import { fonts, spacing } from '../../../constants/theme';
 import { useAnalyzeMutation } from '../../../hooks/useAnalysis';
 import { useTheme } from '../../../hooks/useTheme';
-import { useToast } from '../../../hooks/useToast';
 import { useTrending } from '../../../hooks/useTrending';
 import { useAnalysisNotifier } from '../../../context/AnalysisNotifierContext';
 
@@ -22,7 +21,6 @@ export default function AnalizScreen() {
   const [sub,  setSub]  = useState(null); // null = ana | { title } = geçmiş morph
   const { mutate, isPending } = useAnalyzeMutation();
   const { data: trending } = useTrending();
-  const toast = useToast();
   const { track } = useAnalysisNotifier();
 
   useEffect(() => {
@@ -40,16 +38,13 @@ export default function AnalizScreen() {
     mutate({ type, payload }, {
       onSuccess: (data) => {
         if (!data.task_id) return;
-        if (data.is_direct_match) {
-          // Sonuç hazır → doğrudan göster
-          router.push(`/(tabs)/analiz/${data.task_id}`);
-        } else {
-          // Async → kullanıcı beklemesin; arka planda takip et, bitince toast gelir
-          track(data.task_id);
-          if (mode === 'text') setText('');
-          if (mode === 'url')  setUrl('');
-          toast.info('Hazır olunca üstten haber vereceğiz.', { title: 'Analiz başladı' });
-        }
+        // Async analizi arka planda da takip et — kullanıcı sonuç ekranından
+        // ayrılsa bile bitince üstten "Görüntüle" toast'ı gelir.
+        if (!data.is_direct_match) track(data.task_id);
+        if (mode === 'text') setText('');
+        if (mode === 'url')  setUrl('');
+        // Sonuç ekranına git: hazır değilse bekleme kartı (Gemini gelene dek) gösterilir
+        router.push(`/(tabs)/analiz/${data.task_id}`);
       },
     });
   }
