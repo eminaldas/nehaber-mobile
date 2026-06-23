@@ -26,9 +26,14 @@ export default function AnalizScreen() {
   }, [params.url]);
 
   function handleSubmit() {
-    const payload = mode === 'url' ? url.trim() : text.trim();
-    if (!payload) return;
-    mutate({ type: mode, payload }, {
+    const raw = (mode === 'url' ? url : text).trim();
+    if (!raw) return;
+    // Boşluksuz + alan adı gibi görünen girdi = URL → scrape et (metin kutusuna
+    // yapıştırılsa bile). Şema yoksa https:// ekle.
+    const looksLikeUrl = !/\s/.test(raw) && /^(https?:\/\/)?[\w-]+(\.[\w-]+)+\S*$/i.test(raw);
+    const type = mode === 'url' || looksLikeUrl ? 'url' : 'text';
+    const payload = type === 'url' && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
+    mutate({ type, payload }, {
       onSuccess: (data) => { if (data.task_id) router.push(`/(tabs)/analiz/${data.task_id}`); },
     });
   }
