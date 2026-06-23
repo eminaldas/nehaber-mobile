@@ -1,7 +1,10 @@
 import { router } from 'expo-router';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { getAnalysisStatus } from '../services/analysisService';
+import { isAnalysisComplete } from '../hooks/useAnalysis';
 import { useToast } from '../hooks/useToast';
+
+const MAX_TRACK_MS = 90_000;
 
 const AnalysisNotifierContext = createContext(null);
 
@@ -18,7 +21,7 @@ export function AnalysisNotifierProvider({ children }) {
 
   const track = useCallback((taskId) => {
     if (!taskId) return;
-    setPending(prev => (prev.some(p => p.taskId === taskId) ? prev : [...prev, { taskId }]));
+    setPending(prev => (prev.some(p => p.taskId === taskId) ? prev : [...prev, { taskId, started: Date.now() }]));
   }, []);
 
   const drop = (taskId) => setPending(prev => prev.filter(p => p.taskId !== taskId));
@@ -29,8 +32,12 @@ export function AnalysisNotifierProvider({ children }) {
       for (const p of pendingRef.current) {
         try {
           const res = await getAnalysisStatus(p.taskId);
-          const st = (res?.status || '').toUpperCase();
-          if (st === 'SUCCESS') {
+          const overTime = Date.now() - p.started > MAX_TRACK_MS;
+          if ((res?.status || '').toUpperCase() === 'FAILED') {
+            drop(p.taskId);
+            toast.error('Analiz tamamlanamadı.', { title: 'Analiz' });
+          } else if (isAnalysisComplete(res, overTime)) {
+            // Gemini açıklaması (ai_comment) gelince "hazır" de — erken değil
             drop(p.taskId);
             toast.success('Analiz tamamlandı.', {
               title: 'Analiz hazır',
@@ -38,9 +45,6 @@ export function AnalysisNotifierProvider({ children }) {
               onAction: () => router.push(`/(tabs)/analiz/${p.taskId}`),
               duration: 6000,
             });
-          } else if (st === 'FAILED') {
-            drop(p.taskId);
-            toast.error('Analiz tamamlanamadı.', { title: 'Analiz' });
           }
         } catch (_) { /* geçici hata — sonraki yoklamada tekrar denenir */ }
       }

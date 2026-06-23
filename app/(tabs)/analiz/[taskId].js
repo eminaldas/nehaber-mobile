@@ -19,12 +19,9 @@ export default function AnalizSonucScreen() {
   const { taskId } = useLocalSearchParams();
   const { colors } = useTheme();
   const insets     = useSafeAreaInsets();
-  const { data }   = useAnalysisResult(taskId);
+  const { result, isComplete: done, isFailed: failed } = useAnalysisResult(taskId);
   const [reportOpen, setReportOpen] = useState(false);
 
-  const result = data?.result;
-  const done   = data?.status === 'SUCCESS';
-  const failed = data?.status === 'FAILED';
   const status = (result?.ai_comment?.gemini_verdict || result?.prediction || '').toUpperCase();
   const theme  = getAnalysisTheme(status);
   const isUrl  = result?.truth_score != null;
