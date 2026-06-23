@@ -9,7 +9,9 @@ import AppHeader from '../../../components/ui/AppHeader';
 import { fonts, spacing } from '../../../constants/theme';
 import { useAnalyzeMutation } from '../../../hooks/useAnalysis';
 import { useTheme } from '../../../hooks/useTheme';
+import { useToast } from '../../../hooks/useToast';
 import { useTrending } from '../../../hooks/useTrending';
+import { useAnalysisNotifier } from '../../../context/AnalysisNotifierContext';
 
 export default function AnalizScreen() {
   const { colors } = useTheme();
@@ -20,6 +22,8 @@ export default function AnalizScreen() {
   const [sub,  setSub]  = useState(null); // null = ana | { title } = geçmiş morph
   const { mutate, isPending } = useAnalyzeMutation();
   const { data: trending } = useTrending();
+  const toast = useToast();
+  const { track } = useAnalysisNotifier();
 
   useEffect(() => {
     if (params.url) { setMode('url'); setUrl(String(params.url)); }
@@ -34,7 +38,19 @@ export default function AnalizScreen() {
     const type = mode === 'url' || looksLikeUrl ? 'url' : 'text';
     const payload = type === 'url' && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
     mutate({ type, payload }, {
-      onSuccess: (data) => { if (data.task_id) router.push(`/(tabs)/analiz/${data.task_id}`); },
+      onSuccess: (data) => {
+        if (!data.task_id) return;
+        if (data.is_direct_match) {
+          // Sonuç hazır → doğrudan göster
+          router.push(`/(tabs)/analiz/${data.task_id}`);
+        } else {
+          // Async → kullanıcı beklemesin; arka planda takip et, bitince toast gelir
+          track(data.task_id);
+          if (mode === 'text') setText('');
+          if (mode === 'url')  setUrl('');
+          toast.info('Hazır olunca üstten haber vereceğiz.', { title: 'Analiz başladı' });
+        }
+      },
     });
   }
 
