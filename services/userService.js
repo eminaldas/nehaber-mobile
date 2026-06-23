@@ -18,3 +18,14 @@ export async function removeHiddenCategory(slug) {
   const { data } = await api.patch('/users/me/feed-preferences', { remove_hidden_category: slug });
   return data;
 }
+
+// Alt kategori gizleme — "ana/alt" formatında (ör. "spor/futbol")
+export async function addHiddenSubcategory(pair) {
+  const { data } = await api.patch('/users/me/feed-preferences', { add_hidden_subcategory: pair });
+  return data;
+}
+
+export async function removeHiddenSubcategory(pair) {
+  const { data } = await api.patch('/users/me/feed-preferences', { remove_hidden_subcategory: pair });
+  return data;
+}

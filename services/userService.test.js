@@ -1,6 +1,6 @@
 jest.mock('./api', () => ({ __esModule: true, default: { get: jest.fn(), patch: jest.fn() } }));
 import api from './api';
-import { getFeedPreferences, addHiddenCategory, removeHiddenCategory } from './userService';
+import { getFeedPreferences, addHiddenCategory, removeHiddenCategory, addHiddenSubcategory, removeHiddenSubcategory } from './userService';
 
 beforeEach(() => jest.clearAllMocks());
 
@@ -26,4 +26,16 @@ test('removeHiddenCategory doğru body gönderir', async () => {
   api.patch.mockResolvedValue({ data: {} });
   await removeHiddenCategory('spor');
   expect(api.patch).toHaveBeenCalledWith('/users/me/feed-preferences', { remove_hidden_category: 'spor' });
+});
+
+test('addHiddenSubcategory "ana/alt" body gönderir', async () => {
+  api.patch.mockResolvedValue({ data: {} });
+  await addHiddenSubcategory('spor/futbol');
+  expect(api.patch).toHaveBeenCalledWith('/users/me/feed-preferences', { add_hidden_subcategory: 'spor/futbol' });
+});
+
+test('removeHiddenSubcategory "ana/alt" body gönderir', async () => {
+  api.patch.mockResolvedValue({ data: {} });
+  await removeHiddenSubcategory('spor/futbol');
+  expect(api.patch).toHaveBeenCalledWith('/users/me/feed-preferences', { remove_hidden_subcategory: 'spor/futbol' });
 });
