@@ -52,6 +52,14 @@ export default function AnalizSonucScreen() {
             <CornerBrackets color={theme.hex} />
             <VerdictCard result={result} />
 
+            {!(result.is_direct_match || result.isDirectMatch) && (
+              <Pressable style={[styles.topReportBtn, { borderColor: alpha(theme.hex, 0.4), backgroundColor: alpha(theme.hex, 0.08) }]} onPress={() => setReportOpen(true)}>
+                <Ionicons name="document-text-outline" size={16} color={theme.hex} />
+                <Text style={[styles.topReportText, { color: theme.hex }]}>Tam Raporu Göster</Text>
+                <Ionicons name="chevron-forward" size={15} color={theme.hex} />
+              </Pressable>
+            )}
+
             <View style={{ padding: spacing.md, gap: spacing.md }}>
               {isUrl && !!result.scraped_title && (
                 <Text style={[styles.scraped, { color: theme.hex }]} numberOfLines={2}>{result.scraped_title}</Text>
@@ -75,11 +83,6 @@ export default function AnalizSonucScreen() {
             </View>
 
             <FeedbackBar taskId={taskId} prediction={status} />
-
-            <Pressable style={[styles.reportBtn, { borderTopColor: colors.border }]} onPress={() => setReportOpen(true)}>
-              <Ionicons name="document-text-outline" size={16} color={colors.text.secondary} />
-              <Text style={[styles.reportText, { color: colors.text.secondary }]}>Tam Raporu Gör →</Text>
-            </Pressable>
           </View>
         )}
       </ScrollView>
@@ -97,8 +100,8 @@ const styles = StyleSheet.create({
   scraped:    { fontFamily: fonts.semibold, fontSize: 13 },
   srcLink:    { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', borderWidth: 1, paddingHorizontal: spacing.sm, paddingVertical: 6 },
   srcLinkText:{ fontFamily: fonts.semibold, fontSize: 12 },
-  reportBtn:  { flexDirection: 'row', alignItems: 'center', gap: 8, borderTopWidth: 1, paddingHorizontal: spacing.md, paddingVertical: spacing.md },
-  reportText: { fontFamily: fonts.bold, fontSize: 14 },
+  topReportBtn:  { flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, marginHorizontal: spacing.md, marginTop: spacing.md, paddingHorizontal: spacing.md, paddingVertical: 11 },
+  topReportText: { flex: 1, fontFamily: fonts.bold, fontSize: 13 },
   errBox:     { borderWidth: 1, borderColor: '#ff735150', backgroundColor: 'rgba(255,115,81,0.06)', padding: spacing.md, gap: spacing.sm },
   errText:    { color: '#ff7351', fontFamily: fonts.bold, fontSize: 14 },
   retry:      { fontFamily: fonts.bold, fontSize: 13 },
