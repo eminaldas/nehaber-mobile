@@ -9,6 +9,7 @@ import CornerBrackets from '../../../components/analysis/CornerBrackets';
 import BottomSheet from '../../../components/ui/BottomSheet';
 import AppHeader from '../../../components/ui/AppHeader';
 import SettingsMenu from '../../../components/profile/SettingsMenu';
+import AllBadgesSheet from '../../../components/profile/AllBadgesSheet';
 import { fonts, getAnalysisTheme, palette, radius, spacing } from '../../../constants/theme';
 import { useAuth } from '../../../hooks/useAuth';
 import { useTheme } from '../../../hooks/useTheme';
@@ -39,6 +40,7 @@ export default function ProfilScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [badgesOpen, setBadgesOpen] = useState(false);
 
   const { data: me }    = useQuery({ queryKey: ['me'], queryFn: getMe, enabled: isAuth });
   const { data: stats } = useQuery({ queryKey: ['user-stats'], queryFn: async () => (await api.get('/users/me/stats')).data, enabled: isAuth });
@@ -153,8 +155,16 @@ export default function ProfilScreen() {
         {/* Rozetler */}
         {badgeList.length > 0 && (
           <>
-            <View style={styles.secRow}>
+            <View style={[styles.secRow, styles.secRowBetween]}>
               <Text style={[styles.secLabel, { color: colors.text.secondary }]}>ROZETLER</Text>
+              <Pressable
+                onPress={() => setBadgesOpen(true)}
+                hitSlop={10}
+                style={({ pressed }) => [styles.seeAll, pressed && { opacity: 0.6 }]}
+              >
+                <Text style={[styles.seeAllText, { color: palette.brand.bright }]}>Tümü</Text>
+                <Ionicons name="chevron-forward" size={13} color={palette.brand.bright} />
+              </Pressable>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badges}>
               {badgeList.map(b => (
@@ -240,6 +250,9 @@ export default function ProfilScreen() {
           </>
         )}
       </BottomSheet>
+
+      {/* Tüm rozetler sheet */}
+      <AllBadgesSheet visible={badgesOpen} onClose={() => setBadgesOpen(false)} earned={earned} locked={locked} />
     </View>
   );
 }
@@ -286,7 +299,10 @@ const styles = StyleSheet.create({
 
   // Bölüm
   secRow:         { paddingHorizontal: spacing.md, marginTop: spacing.xl, marginBottom: spacing.sm },
+  secRowBetween:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   secLabel:       { fontFamily: fonts.bold, fontSize: 10.5, letterSpacing: 1.5 },
+  seeAll:         { flexDirection: 'row', alignItems: 'center', gap: 1 },
+  seeAllText:     { fontFamily: fonts.bold, fontSize: 11, letterSpacing: 0.5 },
 
   // Rozetler
   badges:         { paddingHorizontal: spacing.md, gap: spacing.md },
