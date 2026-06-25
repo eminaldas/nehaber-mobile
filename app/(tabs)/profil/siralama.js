@@ -32,6 +32,7 @@ export default function SiralamaScreen() {
         <View style={styles.center}><ActivityIndicator color={palette.brand.primary} /></View>
       ) : (
         <FlatList
+          style={{ flex: 1 }}
           data={entries}
           keyExtractor={(e, i) => `${e.user_id}-${i}`}
           renderItem={({ item }) => <LeaderboardRow entry={item} unit={unit} isMe={item.user_id === myId} />}
