@@ -8,7 +8,14 @@
     "userInterfaceStyle": "automatic",
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#10b981",
+          "dark": { "backgroundColor": "#10b981" }
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": false,

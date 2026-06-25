@@ -5,17 +5,20 @@ import {
 } from '@expo-google-fonts/manrope';
 import { Pacifico_400Regular } from '@expo-google-fonts/pacifico';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { dark } from '../constants/theme';
+import AnimatedSplash from '../components/ui/AnimatedSplash';
 import { AnalysisNotifierProvider } from '../context/AnalysisNotifierContext';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import { ToastProvider } from '../context/ToastContext';
 import { WebSocketProvider } from '../context/WebSocketContext';
 import { useAuth } from '../hooks/useAuth';
+
+// Native splash'ı (yeşil) JS hazır olana kadar açık tut.
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,10 +41,14 @@ export default function RootLayout() {
     Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold,
     Manrope_700Bold, Manrope_800ExtraBold, Pacifico_400Regular,
   });
+  const [splashDone, setSplashDone] = useState(false);
 
-  if (!fontsLoaded) {
-    return <View style={{ flex: 1, backgroundColor: dark.bg.base }} />;
-  }
+  // Fontlar gelince native (yeşil) splash'ı kapat — altında aynı yeşil JS katmanı var, kesintisiz.
+  useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync().catch(() => {});
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null; // native yeşil splash görünmeye devam eder
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -59,6 +66,7 @@ export default function RootLayout() {
           </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
+      {!splashDone && <AnimatedSplash onFinish={() => setSplashDone(true)} />}
     </GestureHandlerRootView>
   );
 }
