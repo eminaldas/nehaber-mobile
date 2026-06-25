@@ -188,6 +188,16 @@ export default function ProfilScreen() {
           </>
         )}
 
+        {/* Sıralama girişi */}
+        <Pressable
+          onPress={() => router.push('/(tabs)/profil/siralama')}
+          style={({ pressed }) => [styles.navRow, { borderColor: colors.border }, pressed && { opacity: 0.6 }]}
+        >
+          <Ionicons name="trophy-outline" size={18} color={palette.brand.bright} />
+          <Text style={[styles.navLabel, { color: colors.text.primary }]}>Sıralama</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.text.muted} />
+        </Pressable>
+
         {/* Son analizler */}
         <View style={styles.secRow}>
           <Text style={[styles.secLabel, { color: colors.text.secondary }]}>SON ANALİZLER</Text>
@@ -303,6 +313,8 @@ const styles = StyleSheet.create({
   secLabel:       { fontFamily: fonts.bold, fontSize: 10.5, letterSpacing: 1.5 },
   seeAll:         { flexDirection: 'row', alignItems: 'center', gap: 1 },
   seeAllText:     { fontFamily: fonts.bold, fontSize: 11, letterSpacing: 0.5 },
+  navRow:         { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: spacing.md, marginTop: spacing.lg, paddingVertical: 13, paddingHorizontal: 14, borderWidth: 1, borderRadius: 8 },
+  navLabel:       { flex: 1, fontFamily: fonts.bold, fontSize: 13.5 },
 
   // Rozetler
   badges:         { paddingHorizontal: spacing.md, gap: spacing.md },
