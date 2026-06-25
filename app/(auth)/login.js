@@ -15,11 +15,14 @@ import { login as loginApi } from '../../services/authService';
 
 export default function LoginScreen() {
   const { colors }    = useTheme();
-  const { login }     = useAuth();
+  const { login, sessionExpired, clearSessionExpired } = useAuth();
   const toast         = useToast();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
+
+  // "Oturum sona erdi" uyarısı bir kez gösterilir, ekrandan çıkınca temizlenir.
+  React.useEffect(() => () => clearSessionExpired(), [clearSessionExpired]);
 
   async function handleLogin() {
     if (!email.trim() || !password) {
@@ -62,6 +65,15 @@ export default function LoginScreen() {
           Hesabına giriş yap — analiz geçmişin ve rozetlerin seni bekliyor.
         </Text>
 
+        {sessionExpired && (
+          <View style={[styles.notice, { borderColor: palette.verdict.iddia + '4d', backgroundColor: palette.verdict.iddia + '14' }]}>
+            <Ionicons name="time-outline" size={15} color={palette.verdict.iddia} />
+            <Text style={[styles.noticeText, { color: colors.text.secondary }]}>
+              Oturum süren doldu. Devam etmek için tekrar giriş yap.
+            </Text>
+          </View>
+        )}
+
         <AuthField
           label="E-posta"
           icon="mail-outline"
@@ -83,7 +95,7 @@ export default function LoginScreen() {
           autoCapitalize="none"
         />
 
-        <Pressable onPress={() => toast.info('Şifre sıfırlama yakında eklenecek.', { title: 'Yakında' })}>
+        <Pressable onPress={() => router.push('/(auth)/sifremi-unuttum')}>
           <Text style={[styles.forgot, { color: colors.text.muted }]}>Şifreni mi unuttun?</Text>
         </Pressable>
 
@@ -127,6 +139,8 @@ const styles = StyleSheet.create({
   logo:        { fontFamily: fonts.logo, fontSize: 23, color: palette.brand.bright },
   title:       { fontFamily: fonts.bold, fontSize: 25, letterSpacing: -0.5, marginTop: spacing.lg },
   subtitle:    { fontFamily: fonts.regular, fontSize: 13, lineHeight: 19, marginTop: spacing.sm },
+  notice:      { flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderRadius: radius.sm, paddingVertical: 10, paddingHorizontal: 12, marginTop: spacing.lg },
+  noticeText:  { flex: 1, fontFamily: fonts.medium, fontSize: 12, lineHeight: 17 },
   forgot:      { fontFamily: fonts.medium, fontSize: 12, textAlign: 'right', marginTop: spacing.md },
   btn:         { backgroundColor: palette.brand.primary, borderRadius: radius.md, paddingVertical: 15, alignItems: 'center', marginTop: spacing.lg, shadowColor: palette.brand.primary, shadowOpacity: 0.25, shadowRadius: 12, shadowOffset: { width: 0, height: 6 } },
   btnText:     { fontFamily: fonts.bold, fontSize: 14.5, color: '#06140d', letterSpacing: 0.2 },

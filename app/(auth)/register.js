@@ -39,7 +39,12 @@ export default function RegisterScreen() {
       });
       await login(data.access_token, data.user);
       toast.success('Hesabın oluşturuldu, hoş geldin!', { title: 'Kayıt başarılı' });
-      router.replace('/onboarding');
+      // Tam kapı: e-posta doğrulanmadan uygulamaya girilemez.
+      if (data.needs_verification && !data.user?.is_email_verified) {
+        router.replace({ pathname: '/(auth)/eposta-dogrula', params: { email: form.email.trim().toLowerCase(), next: 'onboarding' } });
+      } else {
+        router.replace('/onboarding');
+      }
     } catch (err) {
       const detail = err.response?.data?.detail;
       const msg = Array.isArray(detail)
