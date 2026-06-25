@@ -10,6 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AnimatedSplash from '../components/ui/AnimatedSplash';
+import RewardWatcher from '../components/profile/RewardWatcher';
 import { AnalysisNotifierProvider } from '../context/AnalysisNotifierContext';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
@@ -60,6 +61,7 @@ export default function RootLayout() {
                 <WsWrapper>
                   <StatusBar style="auto" />
                   <Stack screenOptions={{ headerShown: false }} />
+                  <RewardWatcher />
                 </WsWrapper>
               </AnalysisNotifierProvider>
             </ToastProvider>
