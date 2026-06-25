@@ -77,7 +77,7 @@ export default function HotAnalysesCard() {
             <Text style={[styles.emptySub, { color: colors.text.muted }]}>Şüpheli bir haberi analiz et — burada ilk sırada görünsün.</Text>
           </View>
         ) : (
-          items.map((item, i) => <Row key={item.task_id} item={item} last={i === items.length - 1} />)
+          items.map((item, i) => <Row key={`${item.task_id}-${i}`} item={item} last={i === items.length - 1} />)
         )}
       </View>
     </View>

@@ -10,6 +10,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { dark } from '../constants/theme';
+import { AnalysisNotifierProvider } from '../context/AnalysisNotifierContext';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import { ToastProvider } from '../context/ToastContext';
@@ -48,10 +49,12 @@ export default function RootLayout() {
         <AuthProvider>
           <ThemeProvider>
             <ToastProvider>
-              <WsWrapper>
-                <StatusBar style="auto" />
-                <Stack screenOptions={{ headerShown: false }} />
-              </WsWrapper>
+              <AnalysisNotifierProvider>
+                <WsWrapper>
+                  <StatusBar style="auto" />
+                  <Stack screenOptions={{ headerShown: false }} />
+                </WsWrapper>
+              </AnalysisNotifierProvider>
             </ToastProvider>
           </ThemeProvider>
         </AuthProvider>

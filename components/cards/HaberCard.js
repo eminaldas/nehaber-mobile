@@ -42,7 +42,7 @@ export default function HaberCard({ item, onPress }) {
             <Text style={{ color: colors.text.muted }}>  ·  {formatTime(item.pub_date)}</Text>
           </Text>
 
-          <Text style={[styles.title, { color: colors.text.primary }]} numberOfLines={3}>
+          <Text style={[styles.title, { color: colors.text.primary }]}>
             {item.title}
           </Text>
 

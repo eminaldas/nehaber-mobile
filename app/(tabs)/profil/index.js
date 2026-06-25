@@ -9,11 +9,11 @@ import CornerBrackets from '../../../components/analysis/CornerBrackets';
 import BottomSheet from '../../../components/ui/BottomSheet';
 import AppHeader from '../../../components/ui/AppHeader';
 import SettingsMenu from '../../../components/profile/SettingsMenu';
+import AllBadgesSheet from '../../../components/profile/AllBadgesSheet';
 import { fonts, getAnalysisTheme, palette, radius, spacing } from '../../../constants/theme';
 import { useAuth } from '../../../hooks/useAuth';
 import { useTheme } from '../../../hooks/useTheme';
 import { getMe } from '../../../services/authService';
-import { getFullReport } from '../../../services/analysisService';
 import api from '../../../services/api';
 
 const TIER_LABELS = { yeni_uye: 'YENİ ÜYE', dogrulayici: 'DOĞRULAYICI', analist: 'ANALİST', dedektif: 'DEDEKTİF' };
@@ -40,6 +40,7 @@ export default function ProfilScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [badgesOpen, setBadgesOpen] = useState(false);
 
   const { data: me }    = useQuery({ queryKey: ['me'], queryFn: getMe, enabled: isAuth });
   const { data: stats } = useQuery({ queryKey: ['user-stats'], queryFn: async () => (await api.get('/users/me/stats')).data, enabled: isAuth });
@@ -47,14 +48,6 @@ export default function ProfilScreen() {
   const { data: history } = useQuery({ queryKey: ['my-history'], queryFn: async () => (await api.get('/users/me/history?page=1&size=10')).data, enabled: isAuth });
   const { data: xp }    = useQuery({ queryKey: ['xp-stats'], queryFn: async () => (await api.get('/gamification/me/stats')).data, enabled: isAuth });
   const { data: trust } = useQuery({ queryKey: ['my-trust'], queryFn: async () => (await api.get('/users/me/trust')).data, enabled: isAuth });
-
-  // Seçili analizin tam raporu gerçekten var mı? (lazy)
-  const { data: reportInfo } = useQuery({
-    queryKey: ['full-report-exists', selected?.task_id],
-    queryFn:  async () => { try { return await getFullReport(selected.task_id); } catch { return { status: 'none' }; } },
-    enabled:  !!selected?.task_id,
-  });
-  const hasFullReport = reportInfo?.status === 'cached';
 
   if (!isAuth) {
     return (
@@ -80,7 +73,8 @@ export default function ProfilScreen() {
   const earned   = badges?.earned ?? [];
   const locked   = badges?.locked ?? [];
   const badgeList = [...earned.map(b => ({ ...b, earned: true })), ...locked.map(b => ({ ...b, earned: false }))].slice(0, 8);
-  const items    = history?.items ?? [];
+  // Yalnız tamamlanmış analizler (ai_comment gelmiş) — bitmemiş NLP sonuçlarını gizle
+  const items    = (history?.items ?? []).filter(it => it.ai_comment != null);
 
   const sel = selected ? verdictOf(selected.prediction) : null;
 
@@ -161,8 +155,16 @@ export default function ProfilScreen() {
         {/* Rozetler */}
         {badgeList.length > 0 && (
           <>
-            <View style={styles.secRow}>
+            <View style={[styles.secRow, styles.secRowBetween]}>
               <Text style={[styles.secLabel, { color: colors.text.secondary }]}>ROZETLER</Text>
+              <Pressable
+                onPress={() => setBadgesOpen(true)}
+                hitSlop={10}
+                style={({ pressed }) => [styles.seeAll, pressed && { opacity: 0.6 }]}
+              >
+                <Text style={[styles.seeAllText, { color: palette.brand.bright }]}>Tümü</Text>
+                <Ionicons name="chevron-forward" size={13} color={palette.brand.bright} />
+              </Pressable>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badges}>
               {badgeList.map(b => (
@@ -238,18 +240,19 @@ export default function ProfilScreen() {
             {!!selected.source_url && (
               <Text style={[styles.sUrl, { color: colors.text.muted }]} numberOfLines={1}>{selected.source_url}</Text>
             )}
-            {hasFullReport && (
-              <Pressable
-                style={({ pressed }) => [styles.fullBtn, { opacity: pressed ? 0.9 : 1 }]}
-                onPress={() => { const tid = selected.task_id; setSelected(null); router.push(`/(tabs)/analiz/rapor/${tid}`); }}
-              >
-                <Ionicons name="document-text-outline" size={16} color="#06140d" />
-                <Text style={styles.fullText}>Tam Raporu Gör</Text>
-              </Pressable>
-            )}
+            <Pressable
+              style={({ pressed }) => [styles.fullBtn, { opacity: pressed ? 0.9 : 1 }]}
+              onPress={() => { const tid = selected.task_id; setSelected(null); router.push(`/(tabs)/analiz/${tid}`); }}
+            >
+              <Ionicons name="reader-outline" size={16} color="#06140d" />
+              <Text style={styles.fullText}>Sonucu ve Tam Raporu Gör</Text>
+            </Pressable>
           </>
         )}
       </BottomSheet>
+
+      {/* Tüm rozetler sheet */}
+      <AllBadgesSheet visible={badgesOpen} onClose={() => setBadgesOpen(false)} earned={earned} locked={locked} />
     </View>
   );
 }
@@ -296,7 +299,10 @@ const styles = StyleSheet.create({
 
   // Bölüm
   secRow:         { paddingHorizontal: spacing.md, marginTop: spacing.xl, marginBottom: spacing.sm },
+  secRowBetween:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   secLabel:       { fontFamily: fonts.bold, fontSize: 10.5, letterSpacing: 1.5 },
+  seeAll:         { flexDirection: 'row', alignItems: 'center', gap: 1 },
+  seeAllText:     { fontFamily: fonts.bold, fontSize: 11, letterSpacing: 0.5 },
 
   // Rozetler
   badges:         { paddingHorizontal: spacing.md, gap: spacing.md },

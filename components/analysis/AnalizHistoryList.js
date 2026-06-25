@@ -20,7 +20,8 @@ export default function AnalizHistoryList() {
     queryFn: async () => (await api.get('/users/me/history?page=1&size=50')).data,
     enabled: isAuth,
   });
-  const items = data?.items ?? [];
+  // Yalnız tamamlanmış analizler (ai_comment gelmiş) — bitmemiş NLP sonuçlarını gizle
+  const items = (data?.items ?? []).filter(it => it.ai_comment != null);
 
   if (!isAuth) {
     return <View style={styles.empty}><Text style={[styles.emptyT, { color: colors.text.muted }]}>Geçmişini görmek için giriş yap.</Text></View>;
@@ -38,7 +39,7 @@ export default function AnalizHistoryList() {
       renderItem={({ item }) => {
         const t = getAnalysisTheme(item.prediction);
         return (
-          <Pressable style={styles.row} onPress={() => router.push(`/(tabs)/analiz/rapor/${item.task_id}`)}>
+          <Pressable style={styles.row} onPress={() => router.push(`/(tabs)/analiz/${item.task_id}`)}>
             <View style={[styles.icon, { backgroundColor: t.hex + '1a' }]}>
               <Ionicons name={t.icon} size={18} color={t.hex} />
             </View>

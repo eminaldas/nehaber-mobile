@@ -44,3 +44,36 @@ export async function getMe() {
   const { data } = await api.get('/auth/me');
   return data; // UserResponse
 }
+
+export async function refresh() {
+  // Mevcut GEÇERLİ token ile yeni 30 dk'lık token üretir (proaktif yenileme).
+  // Süresi dolmuş token ile çağrılırsa backend 401 döner.
+  const { data } = await api.post('/auth/refresh');
+  return data; // { access_token, token_type, expires_in }
+}
+
+// ─── 6 haneli kod tabanlı akışlar (mobil) ───
+
+export async function sendPasswordResetCode(email) {
+  const { data } = await api.post('/auth/password/send-code', { email });
+  return data; // { message, dev_code? }
+}
+
+export async function resetPasswordWithCode(email, code, newPassword) {
+  const { data } = await api.post('/auth/password/reset-with-code', {
+    email,
+    code,
+    new_password: newPassword,
+  });
+  return data; // { message }
+}
+
+export async function sendEmailVerifyCode() {
+  const { data } = await api.post('/auth/email/send-code');
+  return data; // { detail, dev_code? }
+}
+
+export async function verifyEmailWithCode(code) {
+  const { data } = await api.post('/auth/email/verify-code', { code });
+  return data; // UserResponse (is_email_verified: true)
+}
