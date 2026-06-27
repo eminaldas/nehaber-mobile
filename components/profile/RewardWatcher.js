@@ -16,16 +16,19 @@ export default function RewardWatcher() {
     enabled: isAuth,
     staleTime: 60_000,
   });
-  const [current, setCurrent] = useState(null);
+  const [queue, setQueue] = useState([]);
 
+  // Birden çok ödül varsa sırayla göster; kuyruk boşken doldur (refetch sırayı bozmasın).
   useEffect(() => {
-    const r = data?.items?.[0];
-    if (r) setCurrent(r);
+    if (data?.items?.length && queue.length === 0) setQueue(data.items);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
+  const current = queue[0] ?? null;
 
   const close = async () => {
     const r = current;
-    setCurrent(null);
+    setQueue((q) => q.slice(1));   // sıradakine geç
     if (r) await markRewardSeen(r.id).catch(() => {});
   };
 
